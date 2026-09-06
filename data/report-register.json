@@ -1,0 +1,806 @@
+[
+  {
+    "name": "Sagbokodji Community",
+    "lga": "Amuwo Odofin",
+    "district": "Lagos West",
+    "cluster": "2: Under-Governed Belt"
+  },
+  {
+    "name": "Ogogoro Village",
+    "lga": "Amuwo Odofin",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Iyagbe",
+    "lga": "Amuwo Odofin",
+    "district": "Lagos West",
+    "cluster": "2: Under-Governed Belt"
+  },
+  {
+    "name": "Ito Agan comminity",
+    "lga": "Amuwo Odofin",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Inogbe",
+    "lga": "Amuwo Odofin",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Imore",
+    "lga": "Amuwo Odofin",
+    "district": "Lagos West",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Ilashe",
+    "lga": "Amuwo Odofin",
+    "district": "Lagos West",
+    "cluster": "2: Under-Governed Belt"
+  },
+  {
+    "name": "Ilado Odo and Inagbe Island",
+    "lga": "Amuwo Odofin",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Ikaare",
+    "lga": "Amuwo Odofin",
+    "district": "Lagos West",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Igubo isu",
+    "lga": "Amuwo Odofin",
+    "district": "Lagos West",
+    "cluster": "2: Under-Governed Belt"
+  },
+  {
+    "name": "Igbologun",
+    "lga": "Amuwo Odofin",
+    "district": "Lagos West",
+    "cluster": "2: Under-Governed Belt"
+  },
+  {
+    "name": "Igboeseyore",
+    "lga": "Amuwo Odofin",
+    "district": "Lagos West",
+    "cluster": "2: Under-Governed Belt"
+  },
+  {
+    "name": "Igbo elejo",
+    "lga": "Amuwo Odofin",
+    "district": "Lagos West",
+    "cluster": "2: Under-Governed Belt"
+  },
+  {
+    "name": "Ibeshe",
+    "lga": "Amuwo Odofin",
+    "district": "Lagos West",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Ibasa",
+    "lga": "Amuwo Odofin",
+    "district": "Lagos West",
+    "cluster": "2: Under-Governed Belt"
+  },
+  {
+    "name": "Bishop Kodji",
+    "lga": "Amuwo Odofin",
+    "district": "Lagos West",
+    "cluster": "2: Under-Governed Belt"
+  },
+  {
+    "name": "Abule Osun",
+    "lga": "Amuwo Odofin",
+    "district": "Lagos West",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Nanti",
+    "lga": "Apapa",
+    "district": "Lagos Central",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Irede Onisiwo, Apapa Quays",
+    "lga": "Apapa",
+    "district": "Lagos Central",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Povita",
+    "lga": "Badagry",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Kese",
+    "lga": "Badagry",
+    "district": "Lagos West",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Jegeme",
+    "lga": "Badagry",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Iyafin",
+    "lga": "Badagry",
+    "district": "Lagos West",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Iworo",
+    "lga": "Badagry",
+    "district": "Lagos West",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Igbogbele",
+    "lga": "Badagry",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Erekiti",
+    "lga": "Badagry",
+    "district": "Lagos West",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Dadi Louis",
+    "lga": "Badagry",
+    "district": "Lagos West",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Apa",
+    "lga": "Badagry",
+    "district": "Lagos West",
+    "cluster": "2: Under-Governed Belt"
+  },
+  {
+    "name": "Ajido",
+    "lga": "Badagry",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Yegunda",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Take Nla",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Saga",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Oriogoro",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Oriba",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Orepete",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Oregun",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Onijiga",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Onigbagbo",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Olosho",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Olorushogo",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Olorunkoya",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Olatunji Ikeran",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Okotiye",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Okorisan",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Okokeji",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Oko Abe",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Oke Oko",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Oguntedo",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Ogbun",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Ofin Jango",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Odupeyin",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Mudana Seriki",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Mudana Ogidi",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Moyopa",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "2: Under-Governed Belt"
+  },
+  {
+    "name": "Moro",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Mejona",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Luboye",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Ladega",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Ladaba Ebute",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Ladaba",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "2: Under-Governed Belt"
+  },
+  {
+    "name": "Ito osun",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Ito Omu",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Isan",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "2: Under-Governed Belt"
+  },
+  {
+    "name": "Ipesu",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Imougo",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Imeki Oloye",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Imeki Ebute",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Imafon",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Ilamija Nla",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Ilamija Kekere",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Ikeran",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Ijayo",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Igbodu Waterside",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Igbo Apawa",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Idomu",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Idi Afon",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Ibon",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Fowotera",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Ereshe",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Emina",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Ebute Kosu",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Bodun",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Ayesan",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Arafa",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Anwoye",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Alawofun",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Ajegunle",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Agadamgba",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Adepale",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Abureji",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Abomiti",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Abejoye",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Abatuntun",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Aba oyinbo",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Aba keta",
+    "lga": "Epe",
+    "district": "Lagos East",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Tarkwa bay",
+    "lga": "Eti Osa",
+    "district": "Lagos Central",
+    "cluster": "2: Under-Governed Belt"
+  },
+  {
+    "name": "Okunlape",
+    "lga": "Ibeju Lekki",
+    "district": "Lagos East",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Imedu village",
+    "lga": "Ibeju Lekki",
+    "district": "Lagos East",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Ilogbo village",
+    "lga": "Ibeju Lekki",
+    "district": "Lagos East",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Ikegun",
+    "lga": "Ibeju Lekki",
+    "district": "Lagos East",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Idiori",
+    "lga": "Ibeju Lekki",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Dongo",
+    "lga": "Ibeju Lekki",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Arapagi wajoba",
+    "lga": "Ibeju Lekki",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Arapagi lotu",
+    "lga": "Ibeju Lekki",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Abegede",
+    "lga": "Ibeju Lekki",
+    "district": "Lagos East",
+    "cluster": "1: Cut-Off Corridor"
+  },
+  {
+    "name": "Taffi",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Sodanu",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Popokun",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Petepete",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Orufo",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "2: Under-Governed Belt"
+  },
+  {
+    "name": "Origele",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "2: Under-Governed Belt"
+  },
+  {
+    "name": "Origbogbo",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Okoogbo",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Okolundu",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "2: Under-Governed Belt"
+  },
+  {
+    "name": "Okoagbado",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Ojota",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Ojorin",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Moba",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Ishagira",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Irewe",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Irede",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "2: Under-Governed Belt"
+  },
+  {
+    "name": "Ikotun",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Igbo olobi",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "2: Under-Governed Belt"
+  },
+  {
+    "name": "Igbo Oja Nla",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Igbo Oja kekere",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Igamo",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Idoluwo",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Ese Ofin",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Erekun",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Egon",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Dadidi",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Alemou",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "4: Multi-Deprivation"
+  },
+  {
+    "name": "Agonu",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "3: Peri-Urban Cluster"
+  },
+  {
+    "name": "Agaja",
+    "lga": "Ojo",
+    "district": "Lagos West",
+    "cluster": "3: Peri-Urban Cluster"
+  }
+]

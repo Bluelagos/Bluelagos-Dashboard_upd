@@ -1,0 +1,65 @@
+{
+  "id": "osm-processed",
+  "provider": "OpenStreetMap contributors",
+  "retrievedAt": "2026-09-06T12:43:12.245Z",
+  "processedAt": "2026-09-06T12:46:03.652Z",
+  "license": "Open Data Commons Open Database License (ODbL) 1.0",
+  "attribution": "© OpenStreetMap contributors",
+  "crs": "urn:ogc:def:crs:OGC:1.3:CRS84",
+  "boundaryFilter": "Point-in-polygon against GRID3 2022 Lagos State boundary (geoBoundaries gbOpen).",
+  "report": {
+    "inputRecords": 2504,
+    "duplicateOsmIds": 0,
+    "droppedNoGeometry": 0,
+    "droppedOutsideLagos": 4,
+    "unnamedKept": {
+      "health": 3,
+      "marine": 145,
+      "waterway": 1150
+    }
+  },
+  "layers": {
+    "osm-health-facilities": {
+      "title": "OpenStreetMap mapped health facilities",
+      "geometryType": "Point",
+      "featureCount": 539,
+      "namedCount": 536,
+      "unnamedCount": 3,
+      "bbox": [
+        2.8959768,
+        6.4042557,
+        3.6489589,
+        6.6785672
+      ],
+      "limitations": "OpenStreetMap contributor coverage. Not an official Lagos State health facility registry. Presence, position and service level are unverified; some facilities may be missing, closed or duplicated."
+    },
+    "osm-marine-access": {
+      "title": "OpenStreetMap mapped marine access points",
+      "geometryType": "Point",
+      "featureCount": 292,
+      "namedCount": 147,
+      "unnamedCount": 145,
+      "bbox": [
+        2.708001,
+        6.4010617,
+        4.1684101,
+        6.6126456
+      ],
+      "limitations": "Ferry terminals, piers and landing candidates tagged in OpenStreetMap. Not an official jetty register. Official status and navigability are unknown."
+    },
+    "osm-waterways": {
+      "title": "OpenStreetMap mapped waterways",
+      "geometryType": "LineString",
+      "featureCount": 1196,
+      "namedCount": 46,
+      "unnamedCount": 1150,
+      "bbox": [
+        2.703302,
+        6.3876294,
+        4.3005793,
+        6.706551
+      ],
+      "limitations": "waterway=* linework from OpenStreetMap. Navigability is not assessed — these lines must not be treated as a navigable transport network."
+    }
+  }
+}

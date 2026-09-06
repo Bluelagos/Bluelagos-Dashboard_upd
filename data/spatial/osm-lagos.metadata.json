@@ -1,0 +1,12 @@
+{
+  "id": "osm-lagos-context",
+  "title": "OSM Lagos contextual features",
+  "provider": "OpenStreetMap contributors",
+  "source": "https://overpass.kumi.systems/api/interpreter",
+  "retrievedAt": "2026-09-06T12:43:12.245Z",
+  "license": "Open Data Commons Open Database License (ODbL) 1.0",
+  "featureCount": 2504,
+  "processing": "Repeatable Overpass extraction with source IDs and unmodified tags. Features are classified without merging with Blue Lagos field records.",
+  "limitations": "OSM completeness and positional accuracy vary. Landing candidates and waterways are unverified and must not be treated as official or navigable.",
+  "confidence": "Contextual only until matched against authoritative or field evidence"
+}

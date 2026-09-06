@@ -1,0 +1,22 @@
+{
+  "id": "lagos-administrative-boundaries",
+  "title": "Lagos State and LGA boundaries",
+  "provider": "GRID3",
+  "distributor": "geoBoundaries gbOpen",
+  "source": "data.grid3.org/datasets/grid3-nigeria-state-boundaries/explore?location=8.992006%2C8.685290%2C6.82",
+  "sourceApi": "https://www.geoboundaries.org/api/current/gbOpen/NGA/ADM1/",
+  "sourceGeometry": [
+    "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/NGA/ADM1/geoBoundaries-NGA-ADM1_simplified.geojson",
+    "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/NGA/ADM2/geoBoundaries-NGA-ADM2_simplified.geojson"
+  ],
+  "sourceDate": "Sun Feb 26 12:26:14 2023",
+  "boundaryYear": "2022",
+  "retrievedAt": "2026-09-06T11:12:49.611Z",
+  "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+  "geometryType": "Polygon/MultiPolygon",
+  "crs": "OGC:CRS84 (WGS84 longitude/latitude)",
+  "featureCount": 21,
+  "processing": "Selected Lagos ADM1 by source name; selected ADM2 features whose extent centre falls inside Lagos ADM1; retained simplified source geometry; validated geometry types and coordinate ranges.",
+  "limitations": "Open administrative planning context. Not cadastral. Spatial selection is guarded by an expected count of 20 and requires review if the source changes.",
+  "confidence": "High for state/LGA planning context"
+}

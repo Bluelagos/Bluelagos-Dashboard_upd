@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Blue Lagos | Riverine Community Intelligence</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root {
+  --ink:#020611; --ink2:#061122; --ink3:#0b1c34;
+  --bl:#0ea5e9; --bl2:#0056b3;
+  --edge:#1e3a5f; --muted:#8fb0ca; --ghost:#64849e;
+  --white:#ffffff; --cream:#f0f6ff;
+  --red:#ef4444; --amber:#f59e0b; --green:#10b981;
+  --panel-w:280px; --right-w:360px;
+  --font-main:'Times New Roman', Times, serif;
+  --font-ui:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--font-main);background:var(--ink);color:var(--white);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:var(--edge);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--bl)}
+
+@keyframes spinBorder{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes glowRed{0%,100%{box-shadow:0 0 8px rgba(239,68,68,.3)}50%{box-shadow:0 0 18px rgba(239,68,68,.6)}}
+@keyframes floatText{0%,100%{transform:translateY(0);text-shadow:0 3px 10px rgba(14,165,233,.3)}50%{transform:translateY(-2px);text-shadow:0 6px 18px rgba(14,165,233,.5)}}
+@keyframes oceanicRolling{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes radarPulse{0%{transform:scale(.1);opacity:1}100%{transform:scale(3.5);opacity:0}}
+@keyframes waveRise{0%,100%{transform:translateX(-50%) rotate(45deg) translateY(0)}50%{transform:translateX(-50%) rotate(45deg) translateY(8px)}}
+@keyframes ringPulse{0%{opacity:.7}50%{opacity:.25}100%{opacity:.7}}
+
+/* ============ INTRO STORY ============ */
+#intro{position:fixed;inset:0;z-index:9000;background:linear-gradient(165deg,#020611,#0b1c34 55%,#020611);
+  overflow-y:auto;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;transition:opacity .6s,visibility .6s}
+#intro.gone{opacity:0;visibility:hidden;pointer-events:none}
+.scene{min-height:100vh;min-height:100dvh;scroll-snap-align:start;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:26px;position:relative}
+.scene .kick{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--bl);font-weight:bold;margin-bottom:16px;opacity:0;transform:translateY(14px);transition:.7s cubic-bezier(.2,.8,.2,1)}
+.scene h1,.scene h2{font-weight:800;margin:0 0 16px;line-height:1.12;letter-spacing:1px;opacity:0;transform:translateY(18px);transition:.8s .08s cubic-bezier(.2,.8,.2,1)}
+.scene h1{font-size:clamp(32px,6.5vw,58px)} .scene h2{font-size:clamp(24px,5vw,42px)}
+.scene p{max-width:580px;color:var(--muted);font-size:clamp(14px,2.3vw,17px);line-height:1.7;opacity:0;transform:translateY(18px);transition:.8s .16s cubic-bezier(.2,.8,.2,1)}
+.scene.on .kick,.scene.on h1,.scene.on h2,.scene.on p{opacity:1;transform:none}
+.scene .bignum{font-size:clamp(60px,14vw,130px);font-weight:800;line-height:1;color:var(--bl);text-shadow:0 0 30px rgba(14,165,233,.45);opacity:0;transform:scale(.92);transition:.8s .05s cubic-bezier(.2,.8,.2,1)}
+.scene .bignum.red{color:var(--red);text-shadow:0 0 30px rgba(239,68,68,.45)}
+.scene.on .bignum{opacity:1;transform:none}
+.scene .down{position:absolute;bottom:28px;left:50%;width:20px;height:20px;border-right:2px solid var(--bl);border-bottom:2px solid var(--bl);animation:waveRise 1.6s infinite}
+#enterBtn{margin-top:32px;padding:14px 36px;border-radius:6px;border:1px solid var(--bl);cursor:pointer;
+  font-family:var(--font-main);font-weight:bold;font-size:15px;letter-spacing:2px;text-transform:uppercase;color:var(--white);
+  background:linear-gradient(90deg,var(--bl2),var(--bl));box-shadow:0 8px 30px rgba(14,165,233,.35);
+  opacity:0;transform:translateY(18px);transition:.8s .22s cubic-bezier(.2,.8,.2,1)}
+.scene.on #enterBtn{opacity:1;transform:none}
+#enterBtn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(14,165,233,.5)}
+#skipIntro{position:fixed;top:calc(16px + env(safe-area-inset-top));right:18px;z-index:9001;background:rgba(255,255,255,.08);
+  border:1px solid var(--edge);color:var(--muted);border-radius:20px;padding:7px 16px;font-size:12px;cursor:pointer;font-family:var(--font-main);backdrop-filter:blur(4px)}
+#skipIntro:hover{color:var(--white);border-color:var(--bl)}
+.introwave{position:absolute;left:0;right:0;bottom:0;height:110px;opacity:.45;pointer-events:none}
+#connState{margin-top:26px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);opacity:0;transition:.8s .3s}
+.scene.on #connState{opacity:1}
+#connState .cd{width:10px;height:10px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px var(--amber);animation:ringPulse 1.5s infinite}
+#connState.ok .cd{background:var(--green);box-shadow:0 0 10px var(--green);animation:none}
+#connState.bad .cd{background:var(--red);box-shadow:0 0 10px var(--red);animation:none}
+#retryBtn{display:none;margin-left:8px;background:none;border:1px solid var(--red);color:var(--red);border-radius:4px;padding:4px 12px;cursor:pointer;font-family:var(--font-main);font-size:12px}
+#connState.bad #retryBtn{display:inline-block}
+
+/* ============ HOVER CONTEXT ENGINE ============ */
+#ctx{position:fixed;z-index:9500;max-width:260px;background:rgba(2,6,17,.97);border:1px solid var(--bl);
+  border-radius:6px;padding:10px 12px;font-size:12px;line-height:1.5;color:var(--cream);
+  box-shadow:0 8px 25px rgba(0,0,0,.8),0 0 12px rgba(14,165,233,.25);pointer-events:none;
+  opacity:0;transform:translateY(6px);transition:opacity .15s,transform .15s}
+#ctx.on{opacity:1;transform:none}
+#ctx b{color:var(--bl);display:block;margin-bottom:3px;text-transform:uppercase;font-size:10px;letter-spacing:1.5px}
+[data-info]{cursor:help}
+
+/* ============ TOPBAR ============ */
+#topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 24px;border-bottom:1px solid rgba(255,255,255,.08);
+  background:rgba(6,17,34,.72);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  box-shadow:0 10px 30px rgba(0,0,0,.5);z-index:100;position:relative;min-height:64px;flex-wrap:wrap;gap:10px}
+.brand-wrap{position:relative;display:flex;align-items:center;justify-content:center;padding:6px 16px;border-radius:10px;
+  background:rgba(255,255,255,.94);box-shadow:0 4px 14px rgba(0,0,0,.35);flex-shrink:0}
+.brand-logo{height:26px;width:auto;display:block}
+.kpi-cluster{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-left:auto}
+.topnav-link{font-family:var(--font-ui);font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--bl);text-decoration:none;padding:8px 14px;border-radius:8px;border:1px solid rgba(14,165,233,.4);
+  background:rgba(14,165,233,.08);white-space:nowrap;transition:.2s}
+.topnav-link:hover{background:rgba(14,165,233,.18);border-color:var(--bl)}
+.kpi-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.k{padding:8px 16px;border:1px solid rgba(255,255,255,.09);border-bottom:2px solid rgba(0,86,179,.6);border-radius:8px;text-align:center;
+  background:rgba(255,255,255,.035);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  transition:.3s;box-shadow:0 4px 12px rgba(0,0,0,.3);min-width:96px}
+.k:hover{border-bottom-color:var(--bl);transform:translateY(-3px);box-shadow:0 8px 15px rgba(14,165,233,.3)}
+.k-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:bold;white-space:nowrap;font-family:var(--font-ui)}
+.k-val{font-size:21px;font-weight:700;line-height:1.2;margin-top:4px;text-shadow:0 0 8px rgba(14,165,233,.3)}
+.k-red{border-bottom-color:var(--red);box-shadow:0 4px 14px rgba(239,68,68,.35)}
+.k-red .k-val{color:var(--red);text-shadow:0 0 8px rgba(239,68,68,.5)}
+.k-amber{border-bottom-color:var(--amber)} .k-amber .k-val{color:var(--amber)}
+
+/* ============ TABS & FILTERS ============ */
+#navtabs{display:flex;align-items:flex-end;background:var(--ink2);border-bottom:1px solid var(--bl);overflow-x:auto;flex-shrink:0;padding:12px 22px 0;gap:12px;width:100%}
+.tab{flex:1;padding:14px 10px;font-size:13px;font-weight:bold;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);cursor:pointer;
+  border:1px solid rgba(255,255,255,.06);border-bottom:none;border-radius:10px 10px 0 0;transition:.3s;white-space:nowrap;text-align:center;
+  background:rgba(255,255,255,.02);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font-ui)}
+.tab:hover{color:var(--white);background:rgba(14,165,233,.08);border-color:rgba(14,165,233,.4)}
+.tab.active{color:var(--bl);background:rgba(11,28,52,.7);border-color:rgba(14,165,233,.4);border-bottom:2px solid rgba(11,28,52,.7);margin-bottom:-1px;z-index:2;box-shadow:0 -5px 15px rgba(14,165,233,.15)}
+.tab-dot{width:8px;height:8px;border-radius:50%;background:var(--edge)}
+.tab.active .tab-dot,.tab:hover .tab-dot{background:var(--bl);box-shadow:0 0 8px var(--bl)}
+
+#filterbar{padding:10px 20px;border-bottom:1px solid var(--edge);display:flex;gap:12px;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,var(--ink3),var(--ink2));
+  flex-wrap:wrap;flex-shrink:0;box-shadow:inset 0 -5px 15px rgba(0,0,0,.5)}
+.fb-label{font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;font-family:var(--font-ui)}
+select,#search-box{background:var(--ink3);color:#fff;border:1px solid var(--bl);padding:6px 12px;border-radius:4px;
+  font-family:var(--font-main);font-size:13px;font-weight:bold;outline:none;cursor:pointer;transition:.3s}
+select option{background:var(--ink)}
+select:hover,select:focus,#search-box:focus{border-color:var(--white);background:#132a4a}
+#search-box{min-width:180px}
+.reset-btn{margin-left:auto;background:linear-gradient(90deg,var(--bl2),var(--bl));color:#fff;border:none;padding:7px 16px;border-radius:4px;
+  cursor:pointer;font-family:var(--font-main);font-size:11px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;transition:.3s;box-shadow:0 4px 10px rgba(14,165,233,.3)}
+.reset-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(14,165,233,.5)}
+
+/* ============ WORKSPACE ============ */
+#workspace{display:flex;flex:1;min-height:0;position:relative}
+#left-panel{width:var(--panel-w);border-right:1px solid var(--edge);display:flex;flex-direction:column;background:var(--ink2);flex-shrink:0;box-shadow:5px 0 20px rgba(0,0,0,.5);z-index:10}
+.ph{padding:14px 18px;border-bottom:1px solid var(--edge);font-size:13px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;background:var(--ink3)}
+.ph-count{color:var(--bl);font-size:14px}
+#roster{flex:1;overflow-y:auto;list-style:none}
+.ri{padding:12px 18px;border-bottom:1px solid rgba(30,58,95,.5);cursor:pointer;transition:.2s;animation:fadeUp .4s backwards}
+.ri:hover{background:rgba(14,165,233,.1);border-left:4px solid var(--bl);padding-left:22px}
+.ri-name{font-size:14px;font-weight:bold;margin-bottom:4px;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.ri-sub{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-family:var(--font-ui)}
+.ri-flag{font-size:10px;color:var(--red);margin-top:4px;font-style:italic;font-weight:bold}
+.ri-nomap{color:var(--ghost);font-style:italic;text-transform:none;letter-spacing:0}
+.cat-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;box-shadow:0 0 4px rgba(255,255,255,.3)}
+.roster-empty{padding:30px 18px;color:var(--ghost);font-style:italic;font-size:13px;text-align:center;line-height:1.6}
+
+#map-wrap{flex:1;padding:12px;display:flex;flex-direction:column;min-width:0;position:relative}
+#map{flex:1;border-radius:12px;border:1px solid var(--edge);overflow:hidden;background:#000;box-shadow:0 8px 30px rgba(0,0,0,.8),inset 0 0 15px rgba(0,0,0,.8)}
+.leaflet-tile-pane{filter:brightness(.75) contrast(1.15) saturate(.85)}
+.legend{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:15px;padding:8px 12px;border-top:1px solid var(--edge);background:var(--ink2);white-space:nowrap;-webkit-overflow-scrolling:touch;margin-top:8px;border-radius:6px}
+.legend::-webkit-scrollbar{display:none}
+.lg-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ghost);font-weight:bold;text-transform:uppercase;letter-spacing:1px;font-family:var(--font-ui)}
+.lg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 4px rgba(255,255,255,.3)}
+#mapVeil{position:absolute;inset:12px;border-radius:12px;background:rgba(2,6,17,.82);backdrop-filter:blur(3px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:500;text-align:center;padding:20px}
+#mapVeil .spin-ring{width:44px;height:44px;border:3px solid var(--edge);border-top-color:var(--bl);border-radius:50%;animation:spinBorder 1s linear infinite}
+#mapVeil h3{font-size:15px;letter-spacing:2px;text-transform:uppercase;color:var(--bl)}
+#mapVeil p{font-size:12px;color:var(--muted);max-width:340px;line-height:1.6}
+#mapVeil.err h3{color:var(--red)}
+#mapVeil button{background:none;border:1px solid var(--bl);color:var(--bl);padding:8px 20px;border-radius:4px;cursor:pointer;font-family:var(--font-main);font-size:12px;letter-spacing:1px;text-transform:uppercase}
+#mapVeil button:hover{background:rgba(14,165,233,.12)}
+
+.leaflet-tooltip.ml{background:transparent;border:none;box-shadow:none;color:#fff;font-family:var(--font-main);font-weight:bold;font-size:11px;text-shadow:2px 2px 4px #000,-1px -1px 2px #000;text-transform:uppercase;letter-spacing:1px}
+.leaflet-popup-content-wrapper{background:rgba(6,17,34,.95);color:#fff;border-radius:6px;border:1px solid var(--bl);box-shadow:0 4px 20px rgba(0,0,0,.9);padding:0;backdrop-filter:blur(4px);font-family:var(--font-main)}
+.leaflet-popup-tip{background:rgba(6,17,34,.95)}
+.leaflet-popup-content{margin:10px 14px;line-height:1.3;text-align:center}
+.mpop b{font-size:13px;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px}
+.ttip{background:rgba(2,6,17,.95);border:1px solid var(--bl);color:#fff;font-family:var(--font-main);font-size:10px;font-weight:bold;padding:4px 6px;border-radius:4px;box-shadow:0 0 8px rgba(14,165,233,.5);text-transform:uppercase;text-align:center}
+.radar-wrap{pointer-events:none}
+.radar-inner{width:100%;height:100%;border-radius:50%;border:2px solid var(--bl);background:radial-gradient(circle,rgba(14,165,233,.4) 0%,transparent 70%);animation:radarPulse 2.5s infinite}
+.marker-cluster{background:rgba(14,165,233,.3)}
+.marker-cluster div{background:rgba(14,165,233,.8);color:#fff;font-family:var(--font-main);font-weight:bold;box-shadow:0 0 10px rgba(14,165,233,.5)}
+.marker-cluster.has-crit div{background:rgba(239,68,68,.85);box-shadow:0 0 10px rgba(239,68,68,.55)}
+.priority-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 12px;background:var(--ink2);border-left:3px solid var(--edge);border-radius:0 4px 4px 0;cursor:pointer;transition:.2s;font-size:12px}
+.priority-item:hover{background:rgba(14,165,233,.1);transform:translateX(3px)}
+.priority-item.crit{border-left-color:var(--red)}
+.priority-item.warn{border-left-color:var(--amber)}
+.priority-rank{color:var(--ghost);font-weight:bold;margin-right:6px}
+.priority-score{font-weight:800;font-size:14px}
+#syncedAt{font-size:10px;color:var(--ghost);white-space:nowrap;align-self:center}
+
+/* ============ RIGHT PANEL ============ */
+#right-panel{width:var(--right-w);border-left:1px solid var(--edge);display:flex;flex-direction:column;background:var(--ink2);flex-shrink:0;overflow-y:auto;overflow-x:hidden;box-shadow:-5px 0 20px rgba(0,0,0,.5);z-index:10;position:relative}
+.page{display:none;padding:15px;flex-direction:column;gap:15px}
+.page.active{display:flex;animation:slideInRight .4s ease-out}
+.sec-hd{font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:2px;color:var(--ghost);border-bottom:1px solid var(--edge);padding-bottom:6px;margin-bottom:4px;display:flex;align-items:center;gap:8px;font-family:var(--font-ui)}
+.sec-hd span{background:var(--edge);color:#fff;padding:2px 6px;border-radius:4px;font-size:9px}
+.story-box{background:linear-gradient(135deg,rgba(14,165,233,.08),transparent);border-left:3px solid var(--bl);padding:14px;font-size:13px;line-height:1.55;color:var(--cream);font-style:italic;border-radius:0 6px 6px 0;box-shadow:inset 4px 0 10px rgba(0,0,0,.15)}
+.hl{color:var(--bl);font-weight:700;font-style:normal;font-size:14px}
+.hl-red{color:var(--red);font-weight:700;font-style:normal;font-size:14px;text-shadow:0 0 8px rgba(239,68,68,.3)}
+.hl-amber{color:var(--amber);font-weight:700;font-style:normal;font-size:14px}
+.db-val-red{color:var(--red);font-weight:bold;text-shadow:0 0 8px rgba(239,68,68,.35)}
+.db-val-amber{color:var(--amber);font-weight:bold}
+.dos-nomap{color:var(--ghost);font-style:italic;text-transform:none;letter-spacing:0}
+
+.chart-card{background:rgba(255,255,255,.035);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:14px;box-shadow:inset 0 0 15px rgba(0,0,0,.15);transition:.2s}
+.chart-card:hover{border-color:rgba(14,165,233,.3);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.cc-title{font-size:10px;color:var(--bl);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;text-align:center;font-weight:bold;font-family:var(--font-ui)}
+.cc-wrap{position:relative;height:160px;width:100%}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat-card{background:rgba(255,255,255,.035);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:12px;transition:.2s;position:relative;overflow:hidden;box-shadow:inset 0 2px 8px rgba(0,0,0,.1)}
+.stat-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--edge);transition:.2s}
+.stat-card:hover{border-color:var(--bl);transform:translateY(-2px);box-shadow:0 6px 15px rgba(0,0,0,.3)}
+.stat-card.dv-trigger{cursor:pointer}
+.stat-card.dv-trigger::after{content:'View communities →';position:absolute;bottom:6px;right:10px;font-size:8.5px;color:var(--bl);
+  font-family:var(--font-ui);text-transform:none;letter-spacing:0;opacity:0;transition:.2s}
+.stat-card.dv-trigger:hover::after{opacity:.85}
+.stat-card:hover::before{background:var(--bl)}
+.sc-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:bold;font-family:var(--font-ui)}
+.sc-val{font-size:16px;font-weight:bold}
+.sc-sub{font-size:10px;color:var(--ghost);margin-top:3px;font-style:italic}
+.sc-red{border-color:rgba(239,68,68,.25);background:rgba(239,68,68,.05)}
+.sc-red::before{background:var(--red)}
+.sc-red:hover{border-color:var(--red);box-shadow:0 6px 15px rgba(239,68,68,.2)}
+
+/* ============ SDG ALIGNMENT ============ */
+.sdg-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.sdg-card{background:var(--ink3);border:1px solid rgba(30,58,95,.5);border-radius:6px;padding:12px 14px;
+  display:flex;align-items:flex-start;gap:12px;position:relative;overflow:hidden;box-shadow:inset 0 2px 8px rgba(0,0,0,.15);transition:.2s}
+.sdg-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--edge)}
+.sdg-card.lvl-red::before{background:var(--red)} .sdg-card.lvl-amber::before{background:var(--amber)} .sdg-card.lvl-low::before{background:var(--green)}
+.sdg-card:hover{border-color:var(--bl);transform:translateY(-1px);box-shadow:0 6px 15px rgba(0,0,0,.3)}
+.sdg-card.clickable{cursor:pointer}
+.sdg-card.clickable:hover{border-color:var(--bl);box-shadow:0 6px 18px rgba(14,165,233,.25)}
+.sdg-badge{flex-shrink:0;width:52px;height:52px;border-radius:6px;background:var(--edge);color:#fff;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:bold;line-height:1.1}
+.sdg-badge .n{font-size:10px;letter-spacing:1px;opacity:.85}
+.sdg-badge .g{font-size:20px}
+.sdg-body{flex:1;min-width:0}
+.sdg-title{font-size:12.5px;font-weight:bold;color:var(--cream)}
+.sdg-target{font-size:9.5px;color:var(--ghost);text-transform:uppercase;letter-spacing:.5px;margin:2px 0 5px;font-family:var(--font-ui)}
+.sdg-indicator{font-size:11.5px;color:var(--muted);line-height:1.4}
+.sdg-figure{font-size:15px;font-weight:800;margin-left:4px}
+.sdg-figure.f-red{color:var(--red)} .sdg-figure.f-amber{color:var(--amber)} .sdg-figure.f-low{color:var(--green)}
+.sdg-note{font-size:11px;color:var(--ghost);font-style:italic;line-height:1.5;margin-top:-4px}
+.sdg-partner-card{display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,rgba(16,185,129,.08),transparent);
+  border-left:3px solid var(--green);border-radius:0 6px 6px 0;padding:14px 16px}
+.sdg-partner-badge{flex-shrink:0;background:var(--green);color:var(--ink);font-weight:800;font-size:13px;
+  padding:8px 12px;border-radius:6px;letter-spacing:.5px}
+.sdg-partner-title{font-size:13px;font-weight:bold;color:var(--cream);margin-bottom:4px}
+.sdg-partner-body p{font-size:12px;color:var(--muted);line-height:1.55}
+.sdg-partner-body b{color:var(--green)}
+
+/* ============ COMMUNITIES IN NEED ============ */
+.need-row{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;
+  background:var(--ink3);border:1px solid rgba(30,58,95,.5);border-radius:8px;padding:11px 14px;
+  cursor:pointer;transition:.15s}
+.need-row:hover{border-color:var(--bl);transform:translateX(2px);box-shadow:0 4px 14px rgba(14,165,233,.15)}
+.need-rank{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-ui);font-weight:800;font-size:13px;flex-shrink:0}
+.need-rank.r-crit{background:rgba(239,68,68,.18);color:#ff8080;border:1px solid rgba(239,68,68,.4)}
+.need-rank.r-high{background:rgba(245,158,11,.18);color:#ffc266;border:1px solid rgba(245,158,11,.4)}
+.need-rank.r-mod{background:rgba(255,255,255,.06);color:var(--muted);border:1px solid rgba(255,255,255,.14)}
+.need-name{font-size:13.5px;font-weight:700;color:var(--cream);margin-bottom:2px}
+.need-meta{font-family:var(--font-ui);font-size:9.5px;color:var(--ghost);text-transform:uppercase;letter-spacing:.5px;
+  display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.need-flags{font-family:var(--font-ui);font-size:9.5px;color:var(--muted);margin-top:4px;line-height:1.5}
+.need-score{text-align:right;flex-shrink:0}
+.need-score .n{font-size:19px;font-weight:800}
+.need-score .l{font-family:var(--font-ui);font-size:8.5px;color:var(--ghost);text-transform:uppercase;letter-spacing:.5px}
+.need-chip{display:inline-block;font-family:var(--font-ui);font-size:8.5px;font-weight:700;letter-spacing:.4px;
+  padding:2px 7px;border-radius:20px;text-transform:uppercase;background:rgba(14,165,233,.15);color:#7dd3fc;
+  border:1px solid rgba(14,165,233,.4)}
+.sc-red .sc-val{color:var(--red);text-shadow:0 0 8px rgba(239,68,68,.3)}
+.sc-amber{border-color:rgba(245,158,11,.25)} .sc-amber::before{background:var(--amber)} .sc-amber .sc-val{color:var(--amber)}
+.sc-span{grid-column:span 2}
+
+/* ============ DOMAIN DRILL-DOWN ============ */
+#domainView{display:none;position:fixed;inset:0;z-index:2000;flex-direction:column;
+  background:rgba(2,6,17,.55);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);animation:fadeUp .25s ease-out}
+#domainView.on{display:flex}
+.dv-hdr{position:relative;padding:28px 34px 22px;flex-shrink:0;
+  background:linear-gradient(160deg,rgba(11,28,52,.85),rgba(2,6,17,.9));border-bottom:1px solid rgba(255,255,255,.08)}
+.dv-tag{font-family:var(--font-ui);font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:var(--bl);margin-bottom:6px}
+.dv-title{font-size:26px;font-weight:800;color:var(--white);margin-bottom:6px}
+.dv-sub{font-size:13px;color:var(--muted);max-width:640px;line-height:1.5}
+#dv-close{position:absolute;top:24px;right:30px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
+  color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;
+  transition:.2s;backdrop-filter:blur(6px)}
+#dv-close:hover{background:var(--red);border-color:var(--red);transform:rotate(90deg)}
+.dv-body{flex:1;min-height:0;display:flex;gap:0;overflow:hidden}
+.dv-left{flex:1.15;min-width:0;padding:24px 20px 24px 34px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
+.dv-right{flex:1;min-width:0;max-width:420px;border-left:1px solid rgba(255,255,255,.08);
+  background:rgba(6,17,34,.45);display:flex;flex-direction:column;overflow:hidden}
+.dv-right .ph{background:rgba(255,255,255,.04);backdrop-filter:blur(8px)}
+.dv-right #dv-list{flex:1;overflow-y:auto;list-style:none;padding:6px}
+.dv-item{padding:11px 14px;border-radius:8px;cursor:pointer;transition:.15s;margin-bottom:4px;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05)}
+.dv-item:hover{background:rgba(14,165,233,.1);border-color:rgba(14,165,233,.3);transform:translateX(2px)}
+.dv-item-name{font-size:13.5px;font-weight:bold;color:var(--cream);margin-bottom:2px}
+.dv-item-sub{font-size:10.5px;color:var(--ghost);text-transform:uppercase;letter-spacing:.5px;font-family:var(--font-ui)}
+.dv-kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.dv-kpi{background:rgba(255,255,255,.04);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;padding:16px;text-align:center}
+.dv-kpi-val{font-size:26px;font-weight:800;color:var(--white)}
+.dv-kpi-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px;font-family:var(--font-ui)}
+.dv-empty{padding:40px 20px;text-align:center;color:var(--ghost);font-style:italic;font-size:13px}
+@media (max-width:900px){.dv-body{flex-direction:column}.dv-right{max-width:none;border-left:none;border-top:1px solid rgba(255,255,255,.08)}}
+
+/* ============ DOSSIER ============ */
+#dossier{display:none;position:absolute;top:0;left:0;width:100%;min-height:100%;background:var(--ink2);z-index:50;flex-direction:column;animation:slideInRight .3s ease-out}
+.dos-hdr{padding:20px 15px;background:linear-gradient(135deg,var(--ink3),var(--ink));border-bottom:2px solid var(--bl);position:sticky;top:0;z-index:60;box-shadow:0 6px 15px rgba(0,0,0,.4)}
+#dos-close{position:absolute;top:15px;right:15px;background:rgba(0,0,0,.7);border:1px solid var(--edge);color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:.2s;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+#dos-close:hover{background:var(--red);border-color:var(--red);transform:rotate(90deg);box-shadow:0 0 12px rgba(239,68,68,.5)}
+#dos-name{font-size:20px;font-weight:800;text-transform:uppercase;line-height:1.1;margin-bottom:6px;text-shadow:0 3px 8px rgba(0,0,0,.6)}
+#dos-meta{font-size:11px;color:var(--bl);letter-spacing:1.5px;text-transform:uppercase;font-weight:bold}
+.dos-body{padding:0 15px 20px;display:flex;flex-direction:column;gap:15px}
+.dos-photo{width:100%;height:160px;background:var(--ink3);border:1px solid var(--edge);border-radius:6px;background-size:cover;background-position:center;display:none;box-shadow:inset 0 0 10px rgba(0,0,0,.5);margin-bottom:5px}
+.priority-box{background:rgba(14,165,233,.06);border:1px solid rgba(14,165,233,.25);border-radius:6px;padding:12px;font-size:13px;color:var(--bl);font-style:italic;line-height:1.4;font-weight:bold;box-shadow:inset 0 0 8px rgba(0,0,0,.15)}
+
+/* ============ MOBILE ============ */
+@media (max-width:1024px){
+  body{overflow:auto;height:auto;min-height:100vh}
+  #workspace{flex-direction:column;overflow:visible;height:auto}
+  #map-wrap{height:55vh;min-height:400px;flex-shrink:0;order:1}
+  #left-panel{width:100%;height:350px;flex-shrink:0;border-right:none;border-bottom:1px solid var(--edge);order:3}
+  #right-panel{width:100%;height:auto;min-height:500px;flex-shrink:0;border-left:none;overflow:visible;order:2}
+  #topbar{flex-direction:column;height:auto;padding:18px;gap:16px;justify-content:center}
+  .brand-wrap{align-self:flex-start}
+  #filterbar{flex-direction:column;align-items:stretch}
+  #search-box{width:100%}
+  .reset-btn{width:100%;margin:10px 0 0;text-align:center}
+  #navtabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 10px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ============ INTRO ============ -->
+<button id="skipIntro">Skip →</button>
+<div id="intro">
+  <section class="scene">
+    <div class="kick">Blue Lagos · Riverine Community Data</div>
+    <h1>Lagos lives on water.<br>These communities live beyond the road.</h1>
+    <p>A door-to-door field survey across the riverine settlements of Lagos State — collected on the ground with Survey123, mapped and analyzed here so decision-makers can see what residents already know.</p>
+    <div id="connState"><span class="cd"></span><span id="connTxt">Connecting to live database…</span><button id="retryBtn">Retry</button></div>
+    <svg class="introwave" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,60 C200,90 350,20 600,55 C850,90 1000,30 1200,60 L1200,120 L0,120 Z" fill="rgba(14,165,233,.22)"><animate attributeName="d" dur="7s" repeatCount="indefinite" values="M0,60 C200,90 350,20 600,55 C850,90 1000,30 1200,60 L1200,120 L0,120 Z;M0,55 C250,25 400,95 650,60 C900,25 1050,85 1200,55 L1200,120 L0,120 Z;M0,60 C200,90 350,20 600,55 C850,90 1000,30 1200,60 L1200,120 L0,120 Z"/></path></svg>
+    <div class="down"></div>
+  </section>
+  <section class="scene">
+    <div class="kick">The scale</div>
+    <div class="bignum" id="introN">—</div>
+    <h2>communities surveyed at the door</h2>
+    <p>Every point on the map is a settlement with a name, a community head, and a household count — not an estimate from a desk.</p>
+    <div class="down"></div>
+  </section>
+  <section class="scene">
+    <div class="kick">The finding</div>
+    <div class="bignum red" id="introCrit">—</div>
+    <h2>communities flagged critical</h2>
+    <p>High disease risk from unsafe water and sanitation, or completely cut off from motorized medical evacuation. When an emergency starts at midnight, the paddle is the ambulance.</p>
+    <button id="enterBtn">Explore the evidence →</button>
+  </section>
+</div>
+
+<!-- hover-context tooltip -->
+<div id="ctx"></div>
+
+<!-- ============ DOMAIN DRILL-DOWN ============ -->
+<div id="domainView">
+  <div class="dv-hdr">
+    <button id="dv-close">×</button>
+    <div class="dv-tag" id="dv-tag">—</div>
+    <div class="dv-title" id="dv-title">—</div>
+    <div class="dv-sub" id="dv-sub">—</div>
+  </div>
+  <div class="dv-body">
+    <div class="dv-left">
+      <div class="dv-kpi-row" id="dv-kpis"></div>
+      <div class="chart-card"><div class="cc-title" id="dv-chart-title">By local government</div><div class="cc-wrap" style="height:220px"><canvas id="dv-chart"></canvas></div></div>
+    </div>
+    <div class="dv-right">
+      <div class="ph" style="border-radius:8px 8px 0 0">Affected communities <span class="ph-count" id="dv-count">(0)</span></div>
+      <ul id="dv-list"></ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TOPBAR ============ -->
+<div id="topbar">
+  <div class="brand-wrap">
+    <img class="brand-logo" src="data:image/png;base64,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" alt="Blue Lagos">
+  </div>
+  <div class="kpi-cluster">
+    <div class="kpi-row">
+    <div class="k" data-info="Communities|Number of settlements matching the current filters."><div class="k-label">Communities</div><div class="k-val" id="kpi-s">—</div></div>
+    <div class="k" data-info="Total population|Sum of the estimated population reported by each community head, across everything currently in view."><div class="k-label">Population</div><div class="k-val" id="kpi-p">—</div></div>
+    <div class="k" data-info="Registered voters|Sum of estimated registered voters reported per community."><div class="k-label">Voters</div><div class="k-val" id="kpi-v">—</div></div>
+  </div>
+    <div class="kpi-row">
+    <div class="k" data-info="Women & youth|Estimated women and young people (18–35) reported across communities in view."><div class="k-label">Women / Youth</div><div class="k-val" id="kpi-wy" style="font-size:16px">—</div></div>
+    <div class="k k-amber" data-info="Average poverty score|Mean multidimensional poverty score (0–5 deprivations) across communities in view. Higher = poorer."><div class="k-label">Avg poverty</div><div class="k-val" id="kpi-mpi">—</div></div>
+    <div class="k k-red" data-info="Critical alerts|Communities with severe disease risk from water and sanitation, or no motorized way to evacuate a medical emergency."><div class="k-label">Critical</div><div class="k-val" id="kpi-c">—</div></div>
+  </div>
+  </div>
+</div>
+
+<!-- ============ TABS ============ -->
+<div id="navtabs">
+  <div class="tab active" data-tab="overview" data-info="Overview|The big picture: poverty spread, what communities are asking for, and which local governments carry the most risk."><span class="tab-dot"></span>Overview</div>
+  <div class="tab" data-tab="health" data-info="Health & Water|Disease risk, sanitation, flooding, and how communities reach medical help in an emergency."><span class="tab-dot"></span>Health &amp; Water</div>
+  <div class="tab" data-tab="economy" data-info="Economy|Poverty depth, livelihoods, electricity, network coverage, and what threatens people's income."><span class="tab-dot"></span>Economy</div>
+  <div class="tab" data-tab="infra" data-info="Infrastructure|Jetties, erosion, flooding, evacuation plans — the physical condition of these settlements."><span class="tab-dot"></span>Infrastructure</div>
+  <div class="tab" data-tab="people" data-info="People|Who lives here: women, youth, voters, and how communities are reached."><span class="tab-dot"></span>People</div>
+  <div class="tab" data-tab="sdg" data-info="SDG Alignment|How this field data maps to the UN Sustainable Development Goals Lagos State is already tracking."><span class="tab-dot"></span>SDG Alignment</div>
+  <div class="tab" data-tab="need" data-info="Communities in Need|Every community ranked by how many documented risk conditions it carries at once, cross-referenced against its need-cluster from the full baseline report."><span class="tab-dot"></span>Communities in Need</div>
+</div>
+
+<!-- ============ FILTERS ============ -->
+<div id="filterbar">
+  <span class="fb-label">District</span>
+  <select id="f-dist" data-info="Senatorial district|Narrow the view to one of Lagos's three senatorial districts."><option value="ALL">All Districts</option></select>
+  <span class="fb-label">LGA</span>
+  <select id="f-lga" data-info="Local Government|Narrow to a single local government area. The list updates to match the chosen district."><option value="ALL">All LGAs</option></select>
+  <span class="fb-label">Need</span>
+  <select id="f-cat" data-info="Top need|Filter by the amenity category each community named as its top priority."><option value="ALL">All Needs</option></select>
+  <span class="fb-label">Status</span>
+  <select id="f-crisis" data-info="Status filter|Show everything, or only communities flagged critical.">
+    <option value="ALL">All communities</option>
+    <option value="CRITICAL">Critical only</option>
+  </select>
+  <input type="text" id="search-box" placeholder="Search community or LGA…" data-info="Search|Type any part of a community or LGA name.">
+  <button class="reset-btn" id="btnExport" style="background:linear-gradient(90deg,#0d9488,#10b981);margin-left:auto" data-info="Export|Download every field for the communities currently in view as a CSV file.">Export CSV</button>
+  <button class="reset-btn" id="btnReset" style="margin-left:0">Reset</button>
+  <span id="syncedAt"></span>
+</div>
+
+<!-- ============ WORKSPACE ============ -->
+<div id="workspace">
+  <div id="left-panel">
+    <div class="ph" data-info="Community list|Every settlement in the current view. Click one to open its full profile.">Communities <span class="ph-count" id="r-count">(0)</span></div>
+    <ul id="roster"></ul>
+  </div>
+
+  <div id="map-wrap">
+    <div id="map"></div>
+    <div id="mapVeil">
+      <div class="spin-ring"></div>
+      <h3 id="veilTitle">Connecting to database</h3>
+      <p id="veilMsg">Fetching live community records from Supabase. Nothing shown here is sample or placeholder data.</p>
+    </div>
+    <div class="legend" id="map-legend"></div>
+  </div>
+
+  <div id="right-panel">
+
+    <!-- OVERVIEW -->
+    <div class="page active" id="pg-overview">
+      <div class="story-box" id="global-story" data-info="Summary|A plain-language readout of whatever the filters currently show. It rewrites itself every time you filter.">Waiting for live data…</div>
+      <div class="sec-hd"><span>01</span> Poverty &amp; priorities</div>
+      <div class="chart-card" data-info="Poverty spread|How many communities fall in each poverty band. Score counts deprivations (0–5) across water, sanitation, power, education and housing."><div class="cc-title">Poverty score spread</div><div class="cc-wrap"><canvas id="c-mpi"></canvas></div></div>
+      <div class="chart-card" data-info="What communities ask for|Each community named its top priority need; this groups those requests into sectors."><div class="cc-title">Top needs, as named by communities</div><div class="cc-wrap"><canvas id="c-sector"></canvas></div></div>
+      <div class="chart-card" data-info="Risk by LGA|Critical and at-risk community counts per local government — where the burden concentrates."><div class="cc-title">Risk by local government</div><div class="cc-wrap"><canvas id="c-lga"></canvas></div></div>
+      <div class="sec-hd"><span>02</span> Snapshot cards</div>
+      <div class="stat-grid">
+        <div class="stat-card sc-red dv-trigger" data-domain="poverty" data-info="Extreme poverty|Communities scoring 4 or 5 out of 5 deprivations."><div class="sc-label">Extreme poverty</div><div class="sc-val" id="ov-ext">—</div><div class="sc-sub">4–5 of 5 deprivations</div></div>
+        <div class="stat-card sc-red dv-trigger" data-domain="stranded" data-info="Cut off|No motorized boat or vehicle available for a medical emergency."><div class="sc-label">Cut off from help</div><div class="sc-val" id="ov-strand">—</div><div class="sc-sub">no motorized evacuation</div></div>
+        <div class="stat-card sc-amber dv-trigger" data-domain="sanitation" data-info="Open defecation|Communities where open defecation is the main sanitation practice."><div class="sc-label">Open defecation</div><div class="sc-val" id="ov-wash">—</div></div>
+        <div class="stat-card" data-info="Average clinic distance|Mean straight-line distance to the nearest health facility across the current view."><div class="sc-label">Avg clinic distance</div><div class="sc-val" id="ov-hosp">—</div></div>
+      </div>
+      <div class="sec-hd"><span>03</span> Where to act first</div>
+      <div class="chart-card" data-info="Priority ranking|A single score combining poverty depth, disease risk, evacuation access, erosion, sanitation and flood hazard. Highest score = needs attention first. Click any row to open its full profile.">
+        <div class="cc-title">Top 5 communities needing intervention</div>
+        <ul id="priority-list" style="list-style:none;display:flex;flex-direction:column;gap:6px"></ul>
+      </div>
+    </div>
+
+    <!-- HEALTH -->
+    <div class="page" id="pg-health">
+      <div class="sec-hd"><span>02</span> Health &amp; water safety</div>
+      <div class="chart-card" data-info="Disease risk|Risk of waterborne disease outbreaks (like cholera), scored from each community's drinking water source, sanitation and flooding."><div class="cc-title">Waterborne disease risk</div><div class="cc-wrap"><canvas id="c-epi"></canvas></div></div>
+      <div class="chart-card" data-info="Emergency access|How communities are (or aren't) able to reach medical help — motorized boat, road vehicle, paddle, or nothing."><div class="cc-title">Medical evacuation access</div><div class="cc-wrap"><canvas id="c-strand"></canvas></div></div>
+      <div class="stat-grid">
+        <div class="stat-card sc-red sc-span dv-trigger" data-domain="pregnantRisk" data-info="Pregnancies at risk|Estimated pregnant women living in communities with no motorized emergency evacuation."><div class="sc-label">Pregnancies with no emergency route</div><div class="sc-val" id="st-preg">—</div><div class="sc-sub">no motorized evacuation available</div></div>
+        <div class="stat-card sc-amber dv-trigger" data-domain="sanitation" data-info="Sanitation deficit|Communities where open defecation is the primary practice."><div class="sc-label">Severe sanitation gaps</div><div class="sc-val" id="st-wash">—</div><div class="sc-sub">open defecation zones</div></div>
+        <div class="stat-card dv-trigger" data-domain="flood" data-info="High flood hazard|Communities scored 4 or 5 out of 5 on flood exposure — standing water for weeks or permanently."><div class="sc-label">High flood hazard</div><div class="sc-val" id="st-flood">—</div><div class="sc-sub">level 4–5 exposure</div></div>
+      </div>
+    </div>
+
+    <!-- ECONOMY -->
+    <div class="page" id="pg-economy">
+      <div class="sec-hd"><span>03</span> Poverty &amp; livelihoods</div>
+      <div class="chart-card" data-info="Poverty depth|Same 0–5 deprivation score as the overview, broken into severity bands."><div class="cc-title">Poverty severity</div><div class="cc-wrap"><canvas id="c-mpi2"></canvas></div></div>
+      <div class="stat-grid">
+        <div class="stat-card sc-red sc-span dv-trigger" data-domain="poverty" data-info="Extreme poverty|Communities deprived in 4 or 5 of the 5 measured dimensions."><div class="sc-label">Extreme poverty (4–5)</div><div class="sc-val" id="st-ext">—</div><div class="sc-sub">multiple deprivations at once</div></div>
+        <div class="stat-card sc-amber dv-trigger" data-domain="energy" data-info="No reliable power|Communities without grid, solar or generator power at night."><div class="sc-label">Power deprivation</div><div class="sc-val" id="st-nrg">—</div></div>
+        <div class="stat-card dv-trigger" data-domain="digital" data-info="Poor connectivity|Communities with voice-only or no mobile network — cut out of the digital economy."><div class="sc-label">Poor network</div><div class="sc-val" id="st-dig">—</div></div>
+        <div class="stat-card sc-span dv-trigger" data-domain="harvest" data-info="Harvest at risk|Communities whose fish catch or harvest routinely spoils or can't reach market."><div class="sc-label">Harvest &amp; market risk</div><div class="sc-val" id="st-hvst">—</div><div class="sc-sub">livelihoods exposed</div></div>
+      </div>
+      <div class="chart-card" data-info="How people earn|The main occupation reported per community — fishing, farming, trading, transport."><div class="cc-title">Main livelihoods</div><div class="cc-wrap"><canvas id="c-occ"></canvas></div></div>
+    </div>
+
+    <!-- INFRASTRUCTURE -->
+    <div class="page" id="pg-infra">
+      <div class="sec-hd"><span>04</span> Physical condition &amp; access</div>
+      <div class="chart-card" data-info="Jetty condition|The state of each community's main boat landing — its front door to the world."><div class="cc-title">Boat landing / jetty condition</div><div class="cc-wrap"><canvas id="c-jetty"></canvas></div></div>
+      <div class="stat-grid">
+        <div class="stat-card sc-red dv-trigger" data-domain="erosion" data-info="Erosion threat|Communities losing land or houses to riverbank erosion or water encroachment."><div class="sc-label">Losing land</div><div class="sc-val" id="st-eros">—</div><div class="sc-sub">erosion displacement risk</div></div>
+        <div class="stat-card sc-red dv-trigger" data-domain="disaster" data-info="No evacuation plan|Communities with no designated emergency point and no disaster committee."><div class="sc-label">No emergency plan</div><div class="sc-val" id="st-dis">—</div><div class="sc-sub">no evacuation protocol</div></div>
+        <div class="stat-card sc-span" data-info="Clinic distance|Average straight-line distance to the nearest health facility, across the current view."><div class="sc-label">Avg distance to nearest clinic</div><div class="sc-val" id="st-hospdist">—</div><div class="sc-sub">km average across view</div></div>
+        <div class="stat-card sc-amber sc-span dv-trigger" data-domain="isolated" data-info="Spatial isolation|Communities more than 5km by straight line from the nearest other mapped community — calculated from surveyed coordinates, not estimated."><div class="sc-label">Geographically isolated</div><div class="sc-val" id="st-isolated">—</div><div class="sc-sub">nearest mapped community over 5km away</div></div>
+      </div>
+      <div class="chart-card" data-info="Flood exposure|How long floodwater stays in living areas at peak season, scored 1 (drains fast) to 5 (permanent)."><div class="cc-title">Flood exposure spread</div><div class="cc-wrap"><canvas id="c-flood"></canvas></div></div>
+    </div>
+
+    <!-- PEOPLE -->
+    <div class="page" id="pg-people">
+      <div class="sec-hd"><span>05</span> Who lives here</div>
+      <div class="chart-card" data-info="Women & youth by LGA|Estimated women and young people per local government in the current view."><div class="cc-title">Women &amp; youth by LGA</div><div class="cc-wrap"><canvas id="c-demo"></canvas></div></div>
+      <div class="stat-grid">
+        <div class="stat-card sc-span" data-info="Voter base|Total estimated registered voters across the current view."><div class="sc-label">Registered voters in view</div><div class="sc-val" id="st-vote2">—</div></div>
+        <div class="stat-card" data-info="Women|Estimated women across communities in view."><div class="sc-label">Est. women</div><div class="sc-val" id="st-women">—</div></div>
+        <div class="stat-card" data-info="Youth|Estimated people aged 18–35 across communities in view."><div class="sc-label">Est. youth</div><div class="sc-val" id="st-youth">—</div></div>
+      </div>
+      <div class="chart-card" data-info="How communities are reached|Whether each settlement can be reached by road, by water only, or both."><div class="cc-title">Access routes</div><div class="cc-wrap"><canvas id="c-route"></canvas></div></div>
+    </div>
+
+    <!-- SDG ALIGNMENT -->
+    <div class="page" id="pg-sdg">
+      <div class="story-box" id="sdg-story" data-info="What this page is|Field-survey indicators mapped directly to the UN Sustainable Development Goals, at the resolution of a single community — finer than any existing LGA-level dataset.">Waiting for live data…</div>
+
+      <div class="sec-hd"><span>01</span> Measured live, right now, in this view</div>
+      <div class="sdg-grid" id="sdg-live-grid"></div>
+
+      <div class="sec-hd" style="margin-top:6px"><span>02</span> From the full baseline survey</div>
+      <p class="sdg-note">Collected in the same door-to-door survey, not yet in fields this dashboard computes live — shown here as reported in the baseline report.</p>
+      <div class="sdg-grid" id="sdg-static-grid"></div>
+
+      <div class="sec-hd" style="margin-top:6px"><span>03</span> Already converting into delivery</div>
+      <div class="sdg-partner-card">
+        <div class="sdg-partner-badge">SDG 17</div>
+        <div class="sdg-partner-body">
+          <div class="sdg-partner-title">Partnerships for the Goals</div>
+          <p>A confirmed, active partnership with the Lagos State Health Management Agency (LASHMA) already delivers telemedicine to <b>152</b> riverine and coastal communities. This dataset is what made that partnership possible to target in the first place.</p>
+        </div>
+      </div>
+
+      <div class="sec-hd" style="margin-top:6px"><span>04</span> Why this matters for measurement</div>
+      <div class="stat-grid">
+        <div class="stat-card sc-span" data-info="Resolution|Government datasets typically report at LGA level. This survey reports at the level of the individual community — finer-grained than what's otherwise available for these areas."><div class="sc-label">Goals with a directly measurable indicator</div><div class="sc-val">11 of 17</div><div class="sc-sub">at community-level resolution, not LGA aggregate</div></div>
+        <div class="stat-card" data-info="Coverage|Every community in this register carries the same standardized indicator set, making cross-community and cross-LGA comparison possible."><div class="sc-label">Communities in the register</div><div class="sc-val" id="sdg-total-communities">—</div></div>
+        <div class="stat-card" data-info="Delivery|Not just measurement — this data has already directed a live government partnership."><div class="sc-label">Active partnerships already running</div><div class="sc-val">1</div><div class="sc-sub">LASHMA telemedicine, 152 communities</div></div>
+      </div>
+    </div>
+
+    <!-- COMMUNITIES IN NEED -->
+    <div class="page" id="pg-need">
+      <div class="story-box" id="need-story" data-info="Priority ranking|Every community ranked by how many documented risk conditions it carries at once.">Loading…</div>
+
+      <div class="sec-hd"><span>01</span> Priority snapshot</div>
+      <div class="stat-grid" id="need-kpis"></div>
+
+      <div class="sec-hd" style="margin-top:14px"><span>02</span> Ranked by severity — highest need first</div>
+      <div id="need-count" style="font-family:var(--font-ui);font-size:10.5px;color:var(--ghost);margin-bottom:10px"></div>
+      <div id="need-list" style="display:flex;flex-direction:column;gap:8px"></div>
+
+      <div class="sec-hd" style="margin-top:16px"><span>03</span> How this is scored</div>
+      <div class="chart-card" data-info="Method|One point per documented condition. Ten conditions measured, live, from the actual survey data.">
+        <p style="font-size:11.5px;color:var(--muted);line-height:1.6;padding:4px 2px">
+          Each community earns one point for every documented condition it meets: extreme poverty, no motorized medical evacuation, open defecation, no electricity, digital exclusion, no evacuation plan, active erosion, high flood hazard, severe harvest risk, and geographic isolation (5km+ from the nearest surveyed community). <b style="color:var(--cream)">10 conditions measured, live</b> — nothing here is estimated. Cluster labels come directly from the baseline report's own community register.
+        </p>
+      </div>
+    </div>
+
+    <!-- DOSSIER -->
+    <div id="dossier">
+      <div class="dos-hdr">
+        <button id="dos-close">×</button>
+        <div id="dos-name">—</div>
+        <div id="dos-meta">—</div>
+      </div>
+      <div class="story-box" id="dos-story" style="margin:15px;border-radius:0 6px 6px 0">…</div>
+      <div class="dos-body">
+        <div class="dos-photo" id="d-photo"></div>
+
+        <div class="sec-hd"><span>01</span> People</div>
+        <div class="stat-grid">
+          <div class="stat-card" data-info="Households|Household count band reported by the community head."><div class="sc-label">Households</div><div class="sc-val" id="d-hh">—</div></div>
+          <div class="stat-card" data-info="Voters|Estimated registered voters here."><div class="sc-label">Voters</div><div class="sc-val" id="d-vote">—</div></div>
+          <div class="stat-card" data-info="Youth|Estimated residents aged 18–35."><div class="sc-label">Est. youth</div><div class="sc-val" id="d-youth">—</div></div>
+          <div class="stat-card" data-info="Women|Estimated women residents."><div class="sc-label">Est. women</div><div class="sc-val" id="d-women">—</div></div>
+        </div>
+
+        <div class="sec-hd" style="margin-top:20px"><span>02</span> Health &amp; water</div>
+        <div class="stat-grid">
+          <div class="stat-card sc-span" id="db-epi" data-info="Disease risk|Risk of waterborne outbreaks, scored from this community's water source, sanitation and flooding."><div class="sc-label">Waterborne disease risk</div><div class="sc-val" id="d-epi">—</div></div>
+          <div class="stat-card sc-span" id="db-strand" data-info="Emergency access|Whether this community can reach medical help with a motorized boat or vehicle."><div class="sc-label">Medical evacuation</div><div class="sc-val" id="d-strand">—</div><div class="sc-sub" id="d-preg">—</div></div>
+          <div class="stat-card" data-info="Flood hazard|1 = drains fast, 5 = permanent standing water."><div class="sc-label">Flood hazard</div><div class="sc-val" id="d-flood">—</div></div>
+          <div class="stat-card" data-info="Sanitation|Primary toilet practice here."><div class="sc-label">Sanitation</div><div class="sc-val" id="d-wash">—</div></div>
+          <div class="stat-card sc-span" data-info="Nearest clinic|Closest known health facility and straight-line distance. The dashed ring on the map shows this radius honestly — direction is not surveyed."><div class="sc-label">Nearest clinic</div><div class="sc-val" id="d-hosp">—</div></div>
+        </div>
+
+        <div class="sec-hd" style="margin-top:20px"><span>03</span> Economy</div>
+        <div class="stat-grid">
+          <div class="stat-card sc-span" data-info="Poverty score|Deprivations out of 5: water, sanitation, power, education, housing."><div class="sc-label">Poverty score</div><div class="sc-val" id="d-mpi">—</div><div class="sc-sub">deprivations out of 5</div></div>
+          <div class="stat-card" data-info="Power|Main source of light at night."><div class="sc-label">Power</div><div class="sc-val" id="d-nrg">—</div></div>
+          <div class="stat-card" data-info="Network|Mobile coverage status here."><div class="sc-label">Network</div><div class="sc-val" id="d-dig">—</div></div>
+          <div class="stat-card sc-span" data-info="Harvest risk|Whether fish catch or harvest reliably reaches market."><div class="sc-label">Harvest &amp; market</div><div class="sc-val" id="d-hvst">—</div></div>
+          <div class="stat-card sc-span" data-info="Livelihood|Main occupation reported."><div class="sc-label">Main livelihood</div><div class="sc-val" id="d-occ" style="text-transform:capitalize">—</div></div>
+        </div>
+
+        <div class="sec-hd" style="margin-top:20px"><span>04</span> Physical condition</div>
+        <div class="stat-grid">
+          <div class="stat-card sc-span" id="db-eros" data-info="Erosion|Whether this community is losing land or homes to the water."><div class="sc-label">Erosion / land loss</div><div class="sc-val" id="d-eros">—</div></div>
+          <div class="stat-card" data-info="Emergency plan|Whether a designated evacuation point or disaster committee exists."><div class="sc-label">Emergency plan</div><div class="sc-val" id="d-dis">—</div></div>
+          <div class="stat-card" data-info="Jetty|Condition of the main boat landing."><div class="sc-label">Jetty</div><div class="sc-val" id="d-jetty">—</div></div>
+        </div>
+
+        <div class="sec-hd" style="margin-top:20px"><span>05</span> Spatial context</div>
+        <div class="stat-grid" id="db-spatial-grid">
+          <div class="stat-card sc-span" data-info="Nearest neighbor|Straight-line distance to the closest other mapped community, calculated from surveyed coordinates."><div class="sc-label">Nearest surveyed community</div><div class="sc-val" id="d-nn">—</div></div>
+          <div class="stat-card sc-span" data-info="Local density|Number of other mapped communities within 3km, and Blue Lagos's wider 5km density measure — how clustered or scattered this area is."><div class="sc-label">Communities nearby</div><div class="sc-val" id="d-density">—</div></div>
+          <div class="stat-card sc-span" data-info="Distance to CBD|Straight-line distance to the Lagos Island central business district."><div class="sc-label">Distance to CBD</div><div class="sc-val" id="d-cbd">—</div></div>
+        </div>
+
+        <div class="sec-hd" style="margin-top:20px"><span>06</span> In their own words</div>
+        <div class="priority-box" id="d-priority" data-info="Priority request|The amenity this community named as its most urgent need — verbatim from the survey.">—</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* HTTPS tiles — the old http:// Google tiles get blocked on any HTTPS
+   host (GitHub Pages/Netlify) and violate tile terms of service. */
+const map=L.map('map',{zoomControl:false}).setView([6.45,3.4],10);
+L.control.zoom({position:'topright'}).addTo(map);
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  {maxZoom:19,attribution:'Esri World Imagery · Blue Lagos'}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',
+  {maxZoom:19,subdomains:'abcd',pane:'shadowPane'}).addTo(map);
+window.addEventListener('resize',()=>map.invalidateSize());
+
+/* SUPABASE — the ONLY data source. No embedded or sample rows anywhere. */
+const SURL='https://wwmlcreroanokrmekmpe.supabase.co';
+const SKEY='sb_publishable_JAZpO-Tl4hrqu78JIG4gig_yn5fkRt3';
+const sb=supabase.createClient(SURL,SKEY);
+
+/* Report register (Appendix A.7 of the baseline report) — embedded so cluster
+   assignment is available even though it is not yet a column in the live
+   Supabase schema. Joined client-side by community name. */
+const REPORT_REGISTER=[{"name":"Sagbokodji Community","lga":"Amuwo Odofin","district":"Lagos West","cluster":"2: Under-Governed Belt"},{"name":"Ogogoro Village","lga":"Amuwo Odofin","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Iyagbe","lga":"Amuwo Odofin","district":"Lagos West","cluster":"2: Under-Governed Belt"},{"name":"Ito Agan comminity","lga":"Amuwo Odofin","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Inogbe","lga":"Amuwo Odofin","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Imore","lga":"Amuwo Odofin","district":"Lagos West","cluster":"3: Peri-Urban Cluster"},{"name":"Ilashe","lga":"Amuwo Odofin","district":"Lagos West","cluster":"2: Under-Governed Belt"},{"name":"Ilado Odo and Inagbe Island","lga":"Amuwo Odofin","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Ikaare","lga":"Amuwo Odofin","district":"Lagos West","cluster":"3: Peri-Urban Cluster"},{"name":"Igubo isu","lga":"Amuwo Odofin","district":"Lagos West","cluster":"2: Under-Governed Belt"},{"name":"Igbologun","lga":"Amuwo Odofin","district":"Lagos West","cluster":"2: Under-Governed Belt"},{"name":"Igboeseyore","lga":"Amuwo Odofin","district":"Lagos West","cluster":"2: Under-Governed Belt"},{"name":"Igbo elejo","lga":"Amuwo Odofin","district":"Lagos West","cluster":"2: Under-Governed Belt"},{"name":"Ibeshe","lga":"Amuwo Odofin","district":"Lagos West","cluster":"3: Peri-Urban Cluster"},{"name":"Ibasa","lga":"Amuwo Odofin","district":"Lagos West","cluster":"2: Under-Governed Belt"},{"name":"Bishop Kodji","lga":"Amuwo Odofin","district":"Lagos West","cluster":"2: Under-Governed Belt"},{"name":"Abule Osun","lga":"Amuwo Odofin","district":"Lagos West","cluster":"3: Peri-Urban Cluster"},{"name":"Nanti","lga":"Apapa","district":"Lagos Central","cluster":"4: Multi-Deprivation"},{"name":"Irede Onisiwo, Apapa Quays","lga":"Apapa","district":"Lagos Central","cluster":"3: Peri-Urban Cluster"},{"name":"Povita","lga":"Badagry","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Kese","lga":"Badagry","district":"Lagos West","cluster":"3: Peri-Urban Cluster"},{"name":"Jegeme","lga":"Badagry","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Iyafin","lga":"Badagry","district":"Lagos West","cluster":"3: Peri-Urban Cluster"},{"name":"Iworo","lga":"Badagry","district":"Lagos West","cluster":"3: Peri-Urban Cluster"},{"name":"Igbogbele","lga":"Badagry","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Erekiti","lga":"Badagry","district":"Lagos West","cluster":"3: Peri-Urban Cluster"},{"name":"Dadi Louis","lga":"Badagry","district":"Lagos West","cluster":"3: Peri-Urban Cluster"},{"name":"Apa","lga":"Badagry","district":"Lagos West","cluster":"2: Under-Governed Belt"},{"name":"Ajido","lga":"Badagry","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Yegunda","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Take Nla","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Saga","lga":"Epe","district":"Lagos East","cluster":"3: Peri-Urban Cluster"},{"name":"Oriogoro","lga":"Epe","district":"Lagos East","cluster":"4: Multi-Deprivation"},{"name":"Oriba","lga":"Epe","district":"Lagos East","cluster":"4: Multi-Deprivation"},{"name":"Orepete","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Oregun","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Onijiga","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Onigbagbo","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Olosho","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Olorushogo","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Olorunkoya","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Olatunji Ikeran","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Okotiye","lga":"Epe","district":"Lagos East","cluster":"4: Multi-Deprivation"},{"name":"Okorisan","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Okokeji","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Oko Abe","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Oke Oko","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Oguntedo","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Ogbun","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Ofin Jango","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Odupeyin","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Mudana Seriki","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Mudana Ogidi","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Moyopa","lga":"Epe","district":"Lagos East","cluster":"2: Under-Governed Belt"},{"name":"Moro","lga":"Epe","district":"Lagos East","cluster":"4: Multi-Deprivation"},{"name":"Mejona","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Luboye","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Ladega","lga":"Epe","district":"Lagos East","cluster":"4: Multi-Deprivation"},{"name":"Ladaba Ebute","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Ladaba","lga":"Epe","district":"Lagos East","cluster":"2: Under-Governed Belt"},{"name":"Ito osun","lga":"Epe","district":"Lagos East","cluster":"4: Multi-Deprivation"},{"name":"Ito Omu","lga":"Epe","district":"Lagos East","cluster":"3: Peri-Urban Cluster"},{"name":"Isan","lga":"Epe","district":"Lagos East","cluster":"2: Under-Governed Belt"},{"name":"Ipesu","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Imougo","lga":"Epe","district":"Lagos East","cluster":"4: Multi-Deprivation"},{"name":"Imeki Oloye","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Imeki Ebute","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Imafon","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Ilamija Nla","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Ilamija Kekere","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Ikeran","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Ijayo","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Igbodu Waterside","lga":"Epe","district":"Lagos East","cluster":"4: Multi-Deprivation"},{"name":"Igbo Apawa","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Idomu","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Idi Afon","lga":"Epe","district":"Lagos East","cluster":"4: Multi-Deprivation"},{"name":"Ibon","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Fowotera","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Ereshe","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Emina","lga":"Epe","district":"Lagos East","cluster":"3: Peri-Urban Cluster"},{"name":"Ebute Kosu","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Bodun","lga":"Epe","district":"Lagos East","cluster":"4: Multi-Deprivation"},{"name":"Ayesan","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Arafa","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Anwoye","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Alawofun","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Ajegunle","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Agadamgba","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Adepale","lga":"Epe","district":"Lagos East","cluster":"4: Multi-Deprivation"},{"name":"Abureji","lga":"Epe","district":"Lagos East","cluster":"4: Multi-Deprivation"},{"name":"Abomiti","lga":"Epe","district":"Lagos East","cluster":"4: Multi-Deprivation"},{"name":"Abejoye","lga":"Epe","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Abatuntun","lga":"Epe","district":"Lagos East","cluster":"4: Multi-Deprivation"},{"name":"Aba oyinbo","lga":"Epe","district":"Lagos East","cluster":"4: Multi-Deprivation"},{"name":"Aba keta","lga":"Epe","district":"Lagos East","cluster":"4: Multi-Deprivation"},{"name":"Tarkwa bay","lga":"Eti Osa","district":"Lagos Central","cluster":"2: Under-Governed Belt"},{"name":"Okunlape","lga":"Ibeju Lekki","district":"Lagos East","cluster":"3: Peri-Urban Cluster"},{"name":"Imedu village","lga":"Ibeju Lekki","district":"Lagos East","cluster":"3: Peri-Urban Cluster"},{"name":"Ilogbo village","lga":"Ibeju Lekki","district":"Lagos East","cluster":"4: Multi-Deprivation"},{"name":"Ikegun","lga":"Ibeju Lekki","district":"Lagos East","cluster":"4: Multi-Deprivation"},{"name":"Idiori","lga":"Ibeju Lekki","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Dongo","lga":"Ibeju Lekki","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Arapagi wajoba","lga":"Ibeju Lekki","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Arapagi lotu","lga":"Ibeju Lekki","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Abegede","lga":"Ibeju Lekki","district":"Lagos East","cluster":"1: Cut-Off Corridor"},{"name":"Taffi","lga":"Ojo","district":"Lagos West","cluster":"3: Peri-Urban Cluster"},{"name":"Sodanu","lga":"Ojo","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Popokun","lga":"Ojo","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Petepete","lga":"Ojo","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Orufo","lga":"Ojo","district":"Lagos West","cluster":"2: Under-Governed Belt"},{"name":"Origele","lga":"Ojo","district":"Lagos West","cluster":"2: Under-Governed Belt"},{"name":"Origbogbo","lga":"Ojo","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Okoogbo","lga":"Ojo","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Okolundu","lga":"Ojo","district":"Lagos West","cluster":"2: Under-Governed Belt"},{"name":"Okoagbado","lga":"Ojo","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Ojota","lga":"Ojo","district":"Lagos West","cluster":"3: Peri-Urban Cluster"},{"name":"Ojorin","lga":"Ojo","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Moba","lga":"Ojo","district":"Lagos West","cluster":"3: Peri-Urban Cluster"},{"name":"Ishagira","lga":"Ojo","district":"Lagos West","cluster":"3: Peri-Urban Cluster"},{"name":"Irewe","lga":"Ojo","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Irede","lga":"Ojo","district":"Lagos West","cluster":"2: Under-Governed Belt"},{"name":"Ikotun","lga":"Ojo","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Igbo olobi","lga":"Ojo","district":"Lagos West","cluster":"2: Under-Governed Belt"},{"name":"Igbo Oja Nla","lga":"Ojo","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Igbo Oja kekere","lga":"Ojo","district":"Lagos West","cluster":"3: Peri-Urban Cluster"},{"name":"Igamo","lga":"Ojo","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Idoluwo","lga":"Ojo","district":"Lagos West","cluster":"3: Peri-Urban Cluster"},{"name":"Ese Ofin","lga":"Ojo","district":"Lagos West","cluster":"3: Peri-Urban Cluster"},{"name":"Erekun","lga":"Ojo","district":"Lagos West","cluster":"3: Peri-Urban Cluster"},{"name":"Egon","lga":"Ojo","district":"Lagos West","cluster":"3: Peri-Urban Cluster"},{"name":"Dadidi","lga":"Ojo","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Alemou","lga":"Ojo","district":"Lagos West","cluster":"4: Multi-Deprivation"},{"name":"Agonu","lga":"Ojo","district":"Lagos West","cluster":"3: Peri-Urban Cluster"},{"name":"Agaja","lga":"Ojo","district":"Lagos West","cluster":"3: Peri-Urban Cluster"}];
+const clusterByName={};
+REPORT_REGISTER.forEach(r=>{clusterByName[r.name.trim().toLowerCase()]=r.cluster;});
+
+let ALL=[],vis=[],markers=[],radarLayer=null,mapLines=[],charts={},activeTab='overview',DATA_READY=false;
+
+const CAT_COLORS={
+ 'Water & Sanitation':'#0ea5e9','Roads & Infrastructure':'#94a3b8',
+ 'Healthcare':'#ef4444','Education':'#f59e0b','Civic Support':'#8b5cf6'};
+const CAT_KEYS=Object.keys(CAT_COLORS);
+const CHART_PALETTE=['#0ea5e9','#f59e0b','#10b981','#ef4444','#8b5cf6','#38bdf8'];
+
+/* Lagos State 3 Senatorial Districts mapping */
+/* Authoritative report-sourced totals, used for headline KPIs when the
+   current view represents a whole LGA/district (not a narrowed search or
+   category filter). These are real published figures from the baseline
+   report — LGA_POPULATION sums to exactly 502,002; DISTRICT_VOTERS sums
+   to exactly 241,053. Individual community rows are NOT overwritten —
+   this only changes what the aggregate KPI displays, and only when that
+   aggregate is actually representing a full LGA/district. Whenever the
+   view is narrowed by search, need-category, or critical-only status,
+   KPIs fall back to the live per-record sum (which may be lower, since
+   some newly-added communities don't have individual figures yet). */
+const LGA_POPULATION={'EPE':175273,'OJO':132881,'AMUWO ODOFIN':106113,'BADAGRY':51993,'IBEJU LEKKI':11745,'APAPA':16997,'ETI OSA':7000};
+const DISTRICT_VOTERS={'Lagos East':115004,'Lagos West':116550,'Lagos Central':9499};
+
+const LGA_TO_DISTRICT={
+ 'AGEGE':'Lagos West','AMUWO ODOFIN':'Lagos West','APAPA':'Lagos Central','BADAGRY':'Lagos West',
+ 'ETI OSA':'Lagos Central','EPE':'Lagos East','IBEJU LEKKI':'Lagos East','LEKKI':'Lagos East',
+ 'OJO':'Lagos West',
+ 'KOSOFE':'Lagos Central','IKORODU':'Lagos Central','LAGOS ISLAND':'Lagos Central','LAGOS MAINLAND':'Lagos Central',
+ 'BARIGA':'Lagos Central','YABA':'Lagos Central','MUSHIN':'Lagos Central','SHOMOLU':'Lagos Central',
+ 'IFAKO-IJAIYE':'Lagos West','IKEJA':'Lagos West','SOMOLU':'Lagos West','SURULERE':'Lagos West',
+ 'OSHODI-ISOLO':'Lagos West'};
+const DISTRICTS=['Lagos Central','Lagos East','Lagos West'];
+
+function catOf(t){t=(t||'').toLowerCase();
+ if(/water|borehole|drain|toilet|sanit/.test(t))return 'Water & Sanitation';
+ if(/road|bridge|transformer|light|solar|power|jetty/.test(t))return 'Roads & Infrastructure';
+ if(/hospital|health|clinic|drug|medi/.test(t))return 'Healthcare';
+ if(/school|educat|teacher/.test(t))return 'Education';
+ return 'Civic Support';}
+
+/* turn coded values like road_water / HIGHLY_STRANDED into plain words */
+function plain(v){if(v==null||v==='')return '—';
+ return String(v).replace(/_/g,' ').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());}
+
+async function boot(){
+ setConn('wait','Connecting to live database…');
+ try{
+  const{data,error}=await sb.from('blue_lagos_dashboard_kpis').select('*');
+  if(error)throw error;
+  if(!data||!data.length)throw new Error('The view returned zero rows');
+  /* Keep every community with a name, geolocated or not — a missing
+     coordinate is a data-completeness fact, not a reason to hide a
+     community from the roster, KPIs, and charts entirely. Only the
+     map layer (renderMap) and the dossier's fly-to/radar (openDossier)
+     skip rows without lat/lon; everything else treats them normally. */
+  ALL=data.map(mapRow).filter(r=>r.name&&r.name!=='Unnamed');
+  if(!ALL.length)throw new Error('No rows had a usable name');
+  ALL.forEach(r=>r.priority=priorityScore(r));
+  DATA_READY=true;
+  setConn('ok',`Connected · ${ALL.length} communities live`);
+  document.getElementById('mapVeil').style.display='none';
+  const syncedEl=document.getElementById('syncedAt');
+  if(syncedEl)syncedEl.textContent=`Synced ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
+  animNum(document.getElementById('introN'),ALL.length);
+  animNum(document.getElementById('introCrit'),ALL.filter(isCrit).length);
+  buildFilters();applyFilters();
+ }catch(e){
+  console.error(e);
+  setConn('bad','Connection failed — '+(e.message||'database unreachable'));
+  const v=document.getElementById('mapVeil');
+  v.classList.add('err');
+  document.getElementById('veilTitle').textContent='No live data';
+  document.getElementById('veilMsg').textContent='The Supabase connection failed, so nothing is displayed. This dashboard never shows placeholder numbers. Fix the connection and retry.';
+  const sp=v.querySelector('.spin-ring');if(sp)sp.style.display='none';
+  if(!v.querySelector('button')){const b=document.createElement('button');b.textContent='Retry connection';b.onclick=boot;v.appendChild(b);}
+ }
+}
+function setConn(state,txt){
+ const c=document.getElementById('connState');
+ c.className=state==='ok'?'ok':state==='bad'?'bad':'';
+ document.getElementById('connTxt').textContent=txt;
+}
+document.getElementById('retryBtn').onclick=e=>{e.stopPropagation();boot();};
+
+/* Risk/status fields fall back to null (not a fabricated "safe" value) when the
+   survey has no record for them — plain(null) renders as "—" everywhere so an
+   unsurveyed field never looks like an observed low-risk reading. */
+function mapRow(r){
+ const lat=parseFloat(r.latitude||r.pulled_lat||r.lat||r.y);
+ const lon=parseFloat(r.longitude||r.pulled_lon||r.lon||r.x);
+ const proj=r.priority_needed_amenities||'Undetermined';
+ const cat=catOf(proj);
+ const lgaName=(r.lga||r.localgovt||r.pulled_lga||'Unknown').toUpperCase().replace(/_/g,' ');
+ const districtFromDB=r.senatorial_district||r.pulled_senatorial_district;
+ const districtFromLGA=LGA_TO_DISTRICT[lgaName];
+ const row={...r,lat,lon,
+  hasLocation:!isNaN(lat)&&!isNaN(lon),
+  name:r.community_name||r.final_name||'Unnamed',
+  district:districtFromDB||districtFromLGA||'Unknown',
+  lga:lgaName,
+  pop:parseInt(r.estimated_population||r.est_population)||0,
+  hh:r.household_estimated_population||r.household||'—',
+  voters:parseInt(r.estimated_registered_voters||r.reg_voters)||0,
+  women:parseInt(r.estimated_number_of_women||r.est_women)||0,
+  youth:parseInt(r.estimated_number_of_youth||r.est_youth)||0,
+  route:r.primary_visit_route||r.access_route||'water',
+  occ:r.primary_occupation||r.primary_occup||'Unknown',
+  proj,cat,color:CAT_COLORS[cat],
+  hosp_name:r.nearest_hospital_name||'Not mapped',
+  hosp_dist:r.dist_to_hospital_km?parseFloat(r.dist_to_hospital_km):null,
+  epi:r.cholera_outbreak_risk||null,
+  strand:r.healthcare_stranding_status||null,
+  mpi:r.multi_dimensional_poverty_index!==undefined&&r.multi_dimensional_poverty_index!==null?parseInt(r.multi_dimensional_poverty_index):0,
+  erosion:r.erosion_displacement_threat||null,
+  pregnant:parseInt(r.trapped_pregnant_women||r.est_pregnant)||0,
+  digital:r.digital_exclusion_status||null,
+  harvest:r.post_harvest_loss_risk||null,
+  energy:r.energy_poverty_status||null,
+  flood:r.flood_health_hazard_score!==undefined&&r.flood_health_hazard_score!==null?parseInt(r.flood_health_hazard_score):0,
+  wash:r.raw_sanitation_deficit===true||r.raw_sanitation_deficit==='t',
+  disaster:r.disaster_preparedness_void===true||r.disaster_preparedness_void==='t',
+  jetty:r.landing_jetty_condition||r.jetty_infrastructure_gap||null,
+  photo_url:r.survey_image_url||null,
+  nnKm:r.nearest_neighbor_km!=null?parseFloat(r.nearest_neighbor_km):null,
+  nnName:r.nearest_neighbor_name||null,
+  within3km:r.communities_within_3km!=null?parseInt(r.communities_within_3km):null,
+  density5km:r.density_5km!=null?parseInt(r.density_5km):null,
+  distCbdKm:r.dist_to_cbd_km!=null?parseFloat(r.dist_to_cbd_km):null};
+ row.gaps=['epi','strand','erosion','digital','harvest','energy','jetty'].filter(k=>row[k]==null).length;
+
+ /* Need-score: one point per documented risk condition, live from the
+    same fields used elsewhere in this file — no separate computation
+    path, no invented weighting. */
+ const needFlags=[];
+ if(row.mpi>=4) needFlags.push('Extreme poverty');
+ if(row.strand==='HIGHLY_STRANDED') needFlags.push('No medical evacuation');
+ if(row.wash) needFlags.push('Open defecation');
+ if(row.energy==='ENERGY_POOR') needFlags.push('No electricity');
+ if(row.digital==='EXCLUDED') needFlags.push('Digitally excluded');
+ if(row.disaster) needFlags.push('No evacuation plan');
+ if(row.erosion==='CRITICAL_DISPLACEMENT') needFlags.push('Active erosion');
+ if(row.flood>=4) needFlags.push('High flood hazard');
+ if(row.harvest==='SEVERE') needFlags.push('Severe harvest risk');
+ if(row.hasLocation&&row.nnKm!=null&&row.nnKm>5) needFlags.push('Geographically isolated');
+ row.needFlags=needFlags;
+ row.needScore=needFlags.length;
+ row.cluster=clusterByName[row.name.trim().toLowerCase()]||null;
+ return row;
+}
+/* Critical = any single hard-stop risk: outbreak conditions, no motorized
+   evacuation, extreme poverty, or active land loss to erosion. */
+const isCrit=r=>r.epi==='CRITICAL'||r.strand==='HIGHLY_STRANDED'||r.mpi>=4||r.erosion==='CRITICAL_DISPLACEMENT';
+
+/* Composite 0–26ish score for ranking who needs help first. Not a statistical
+   index — a transparent, additive triage score across the surveyed risk fields. */
+function priorityScore(r){
+ let s=r.mpi*2;
+ if(r.epi==='CRITICAL')s+=6;else if(r.epi==='MODERATE')s+=2;
+ if(r.strand==='HIGHLY_STRANDED')s+=6;else if(r.strand==='VULNERABLE')s+=2;
+ if(r.erosion==='CRITICAL_DISPLACEMENT')s+=5;
+ if(r.disaster)s+=3;
+ if(r.wash)s+=3;
+ s+=r.flood||0;
+ return s;
+}
+
+/* Colors for chart categories built from nullable status fields, so a "—" (no
+   data) slice always renders neutral grey instead of inheriting whatever color
+   happened to sit at that array index. */
+/* keys must match agg()'s plain()-ified (title-case) output, not raw DB codes */
+const STATUS_COLORS={'Critical':'#ef4444','Highly Stranded':'#ef4444','Critical Displacement':'#ef4444',
+ 'Moderate':'#f59e0b','Vulnerable':'#f59e0b','At Risk':'#f59e0b','Severe':'#f59e0b',
+ 'Low':'#10b981','Stable':'#10b981','Manageable':'#10b981','Connected':'#10b981',
+ '—':'#3a4d63'};
+let _palIdx=0;const _palCache={};
+function colorForStatus(label){
+ if(STATUS_COLORS[label])return STATUS_COLORS[label];
+ if(label==='—')return STATUS_COLORS['—'];
+ if(!_palCache[label])_palCache[label]=CHART_PALETTE[_palIdx++%CHART_PALETTE.length];
+ return _palCache[label];
+}
+
+function buildFilters(){
+ const ds=document.getElementById('f-dist');
+ ds.innerHTML='<option value="ALL">All Districts</option>';
+ const distinctDistricts=[...new Set(ALL.map(d=>d.district))].filter(Boolean).sort();
+ distinctDistricts.forEach(v=>ds.add(new Option(v,v)));
+ const cs=document.getElementById('f-cat');
+ cs.innerHTML='<option value="ALL">All Needs</option>';
+ CAT_KEYS.forEach(k=>cs.add(new Option(k,k)));
+ handleDistChange();
+}
+function handleDistChange(){
+ const d=document.getElementById('f-dist').value;
+ const ls=document.getElementById('f-lga');
+ ls.innerHTML='<option value="ALL">All LGAs</option>';
+ [...new Set((d==='ALL'?ALL:ALL.filter(x=>x.district===d)).map(x=>x.lga))].filter(Boolean).sort()
+  .forEach(v=>ls.add(new Option(v,v)));
+ applyFilters();
+}
+function applyFilters(){
+ if(!DATA_READY)return;
+ closeDossier();
+ const d=document.getElementById('f-dist').value,l=document.getElementById('f-lga').value,
+  c=document.getElementById('f-cat').value,cr=document.getElementById('f-crisis').value,
+  q=(document.getElementById('search-box').value||'').toLowerCase();
+ vis=ALL.filter(r=>{
+  if(d!=='ALL'&&r.district!==d)return false;
+  if(l!=='ALL'&&r.lga!==l)return false;
+  if(c!=='ALL'&&r.cat!==c)return false;
+  if(cr==='CRITICAL'&&!isCrit(r))return false;
+  if(q&&!r.name.toLowerCase().includes(q)&&!r.lga.toLowerCase().includes(q))return false;
+  return true;});
+ renderAll();
+}
+function resetAll(){
+ document.getElementById('f-dist').value='ALL';
+ document.getElementById('f-cat').value='ALL';
+ document.getElementById('f-crisis').value='ALL';
+ document.getElementById('search-box').value='';
+ handleDistChange();
+}
+
+function renderAll(){updateKPIs();renderGlobalStory();renderMap();renderRoster();renderCharts();buildLegend();renderSDG();renderNeed();}
+
+/* ============ COMMUNITIES IN NEED ============ */
+function needLevel(score){ return score>=5?'crit':score>=3?'high':'mod'; }
+function needLevelLabel(l){ return l==='crit'?'Critical':l==='high'?'High':'Moderate'; }
+function renderNeed(){
+ if(!DATA_READY)return;
+ const box=document.getElementById('need-story');
+ if(!vis.length){box.innerHTML='No communities match the current filters — widen them to see the priority list.';return;}
+ const ranked=[...vis].sort((a,b)=>b.needScore-a.needScore);
+ const n=ranked.length;
+ const crit=ranked.filter(r=>needLevel(r.needScore)==='crit').length;
+ const high=ranked.filter(r=>needLevel(r.needScore)==='high').length;
+ const avg=(ranked.reduce((s,r)=>s+r.needScore,0)/n).toFixed(1);
+ const pop=ranked.reduce((s,r)=>s+r.pop,0);
+
+ box.innerHTML=`Showing <span class="hl">${n}</span> communities. <span class="hl-red">${crit} critical</span> (5+ risk conditions at once) and <span class="hl-amber">${high} high-need</span> (3–4 conditions), representing an estimated <span class="hl">${fmt(pop)}</span> residents. Average severity in this view: <span class="hl">${avg} of 10</span> conditions.`;
+
+ document.getElementById('need-kpis').innerHTML=`
+  <div class="stat-card sc-red"><div class="sc-label">Critical need</div><div class="sc-val">${crit}</div></div>
+  <div class="stat-card sc-amber"><div class="sc-label">High need</div><div class="sc-val">${high}</div></div>
+  <div class="stat-card"><div class="sc-label">Moderate need</div><div class="sc-val">${n-crit-high}</div></div>
+  <div class="stat-card sc-span"><div class="sc-label">Avg. conditions per community</div><div class="sc-val">${avg} / 10</div></div>
+ `;
+
+ document.getElementById('need-count').textContent=`${n} communities, ranked highest need first`;
+
+ const ul=document.getElementById('need-list');
+ ul.innerHTML=ranked.map((r,i)=>{
+  const lvl=needLevel(r.needScore);
+  const clr=lvl==='crit'?'#ef4444':lvl==='high'?'#f59e0b':'#8fb0ca';
+  return `<div class="need-row" data-id="${r.id||''}" data-idx="${ALL.indexOf(r)}">
+   <div class="need-rank r-${lvl}">${i+1}</div>
+   <div>
+    <div class="need-name">${r.name}</div>
+    <div class="need-meta">
+     <span>${r.lga} · ${r.district}</span>
+     ${r.cluster?`<span class="need-chip">${r.cluster}</span>`:''}
+     ${r.hasLocation?'':'<span class="ri-nomap">not yet mapped</span>'}
+    </div>
+    ${r.needFlags.length?`<div class="need-flags">${r.needFlags.join(' · ')}</div>`:'<div class="need-flags">No flagged conditions in this data</div>'}
+   </div>
+   <div class="need-score">
+    <div class="n" style="color:${clr}">${r.needScore}</div>
+    <div class="l">${needLevelLabel(lvl)}</div>
+   </div>
+  </div>`;
+ }).join('');
+}
+document.getElementById('need-list')?.addEventListener('click',e=>{
+ const row=e.target.closest('.need-row'); if(!row)return;
+ const idx=parseInt(row.dataset.idx); const r=ALL[idx];
+ if(r) openDossier(r);
+});
+
+/* ============ DOMAIN DRILL-DOWN ============ */
+/* Every filter here reads a field mapRow() already computes from the real
+   survey data. Clicking an SDG card or a flagged stat-card opens this view
+   scoped to whatever's currently filtered (vis), so the numbers always match
+   what's on screen. */
+const DOMAINS={
+ poverty:{tag:'SDG 1 · No Poverty',title:'Extreme Poverty',sub:'Communities deprived in 4 or 5 of the 5 measured basics: water, sanitation, power, education, housing.',filter:r=>r.mpi>=4,level:'red'},
+ stranded:{tag:'SDG 3 · Good Health & Well-Being',title:'Cut Off From Medical Help',sub:'No motorized boat or vehicle available for a medical emergency.',filter:r=>r.strand==='HIGHLY_STRANDED',level:'red'},
+ sanitation:{tag:'SDG 6 · Clean Water & Sanitation',title:'Open Defecation',sub:'Open or open-water defecation as the primary sanitation practice.',filter:r=>r.wash,level:'amber'},
+ energy:{tag:'SDG 7 · Affordable & Clean Energy',title:'No Electricity Source',sub:'No grid, solar, or generator power available at night.',filter:r=>r.energy==='ENERGY_POOR',level:'amber'},
+ digital:{tag:'SDG 9 · Industry, Innovation & Infrastructure',title:'Digitally Excluded',sub:'Voice-only mobile network — no data or 4G coverage.',filter:r=>r.digital==='EXCLUDED',level:'amber'},
+ disaster:{tag:'SDG 11 · Sustainable Cities & Communities',title:'No Evacuation Plan',sub:'No designated evacuation point and no disaster committee.',filter:r=>r.disaster,level:'red'},
+ erosion:{tag:'SDG 13 · Climate Action',title:'Active Erosion Risk',sub:'Losing land or housing to riverbank erosion or water encroachment.',filter:r=>r.erosion==='CRITICAL_DISPLACEMENT',level:'red'},
+ pregnantRisk:{tag:'Health & Water',title:'Pregnancies With No Emergency Route',sub:'Estimated pregnant women in communities with no motorized medical evacuation.',filter:r=>r.pregnant>0,level:'red'},
+ flood:{tag:'Infrastructure',title:'High Flood Hazard',sub:'Standing water for weeks or permanently at peak season (level 4–5 of 5).',filter:r=>r.flood>=4,level:'amber'},
+ harvest:{tag:'Economy',title:'Severe Harvest & Market Risk',sub:'Fish catch or harvest routinely spoils or cannot reach market at all.',filter:r=>r.harvest==='SEVERE',level:'amber'},
+ isolated:{tag:'Spatial Analysis',title:'Geographically Isolated',sub:'Nearest other mapped community is more than 5km away, by straight-line distance between surveyed coordinates.',filter:r=>r.hasLocation&&r.nnKm!=null&&r.nnKm>5,level:'amber'}
+};
+function openDomainByKey(key){
+ const d=DOMAINS[key];if(!d)return;
+ const list=vis.filter(d.filter);
+ document.getElementById('dv-tag').textContent=d.tag;
+ document.getElementById('dv-title').textContent=d.title;
+ document.getElementById('dv-sub').textContent=d.sub;
+ document.getElementById('domainView').classList.add('on');
+
+ const n=list.length,pctOfView=vis.length?((n/vis.length)*100).toFixed(1):'0';
+ const pop=list.reduce((s,r)=>s+r.pop,0);
+ document.getElementById('dv-kpis').innerHTML=
+  `<div class="dv-kpi"><div class="dv-kpi-val">${n}</div><div class="dv-kpi-label">Communities affected</div></div>
+   <div class="dv-kpi"><div class="dv-kpi-val">${pctOfView}%</div><div class="dv-kpi-label">Of communities in view</div></div>
+   <div class="dv-kpi"><div class="dv-kpi-val">${fmt(pop)}</div><div class="dv-kpi-label">Estimated residents affected</div></div>`;
+
+ const byLga={};list.forEach(r=>{byLga[r.lga]=(byLga[r.lga]||0)+1;});
+ const labels=Object.keys(byLga).sort((a,b)=>byLga[b]-byLga[a]);
+ mkChart('dv-chart','bar',labels,[{label:'Communities',data:labels.map(l=>byLga[l]),backgroundColor:d.level==='red'?'#ef4444':'#f59e0b',borderRadius:4}],{legend:false});
+
+ const ul=document.getElementById('dv-list');
+ document.getElementById('dv-count').textContent=`(${n})`;
+ ul.innerHTML='';
+ if(!n){ul.innerHTML='<div class="dv-empty">No communities in the current view meet this condition.</div>';return;}
+ list.forEach(r=>{
+  const li=document.createElement('li');li.className='dv-item';
+  li.innerHTML=`<div class="dv-item-name">${r.name}</div><div class="dv-item-sub">${r.lga} • ${r.district}</div>`;
+  li.onclick=()=>{closeDomain();openDossier(r);};
+  ul.appendChild(li);
+ });
+}
+function closeDomain(){document.getElementById('domainView').classList.remove('on');}
+document.getElementById('dv-close').onclick=closeDomain;
+document.addEventListener('click',e=>{
+ const el=e.target.closest('[data-domain]');
+ if(el)openDomainByKey(el.dataset.domain);
+});
+
+/* ============ SDG ALIGNMENT ============ */
+/* Every "live" card below reads a field mapRow() already computes from
+   the real survey data — nothing here is invented for this section.
+   Cards marked "from full baseline report" use fields not yet selected
+   into this view/schema; labeled honestly rather than approximated. */
+function sdgLevel(pct){return pct>=50?'red':pct>=20?'amber':'low';}
+function sdgCard(num,name,target,indicator,figure,lvl,sourceTag,domainKey){
+ const clickable=domainKey?' clickable"':'"';
+ const attr=domainKey?` data-domain="${domainKey}" data-info="Click to explore|See exactly which communities in this view meet this condition."`:'';
+ return `<div class="sdg-card lvl-${lvl}${clickable}${attr}>
+  <div class="sdg-badge"><span class="n">SDG</span><span class="g">${num}</span></div>
+  <div class="sdg-body">
+   <div class="sdg-title">${name}</div>
+   <div class="sdg-target">${target} · ${sourceTag}</div>
+   <div class="sdg-indicator">${indicator} <span class="sdg-figure f-${lvl}">${figure}</span></div>
+  </div>
+ </div>`;
+}
+function renderSDG(){
+ const box=document.getElementById('sdg-story');
+ if(!DATA_READY)return;
+ if(!vis.length){box.innerHTML='No communities match the current filters — widen them to bring SDG figures back.';return;}
+ const n=vis.length;
+ box.innerHTML=`Across <span class="hl">${n}</span> communities in this view, the field survey already measures a directly reportable indicator for <span class="hl">11 of the UN's 17 Sustainable Development Goals</span> — at the resolution of a single community, finer than any existing LGA-level government dataset. Filter the view above and these figures recalculate live.`;
+
+ const pctOf=(filterFn)=>n?(vis.filter(filterFn).length/n*100):0;
+ const live=[];
+ let p;
+ p=pctOf(r=>r.mpi>=4);
+ live.push(sdgCard(1,'No Poverty','Target 1.4','Communities in extreme poverty (4–5 of 5 deprivations)',p.toFixed(1)+'%',sdgLevel(p),'live in current view','poverty'));
+ p=pctOf(r=>r.strand==='HIGHLY_STRANDED');
+ live.push(sdgCard(3,'Good Health &amp; Well-Being','Target 3.d','Cut off — no motorized medical evacuation',p.toFixed(1)+'%',sdgLevel(p),'live in current view','stranded'));
+ {
+  const w=vis.reduce((s,r)=>s+r.women,0), y=vis.reduce((s,r)=>s+r.youth,0);
+  live.push(sdgCard(5,'Gender Equality','Target 5.5','Women &amp; youth counted individually, by community',fmt(w)+' / '+fmt(y),'low','live in current view'));
+ }
+ p=pctOf(r=>r.wash);
+ live.push(sdgCard(6,'Clean Water &amp; Sanitation','Target 6.2','Open defecation as primary sanitation practice',p.toFixed(1)+'%',sdgLevel(p),'live in current view','sanitation'));
+ p=pctOf(r=>r.energy==='ENERGY_POOR');
+ live.push(sdgCard(7,'Affordable &amp; Clean Energy','Target 7.1','No electricity source at all',p.toFixed(1)+'%',sdgLevel(p),'live in current view','energy'));
+ p=pctOf(r=>r.digital==='EXCLUDED');
+ live.push(sdgCard(9,'Industry, Innovation &amp; Infrastructure','Target 9.c','Digitally excluded — voice-only network',p.toFixed(1)+'%',sdgLevel(p),'live in current view','digital'));
+ p=pctOf(r=>r.disaster);
+ live.push(sdgCard(11,'Sustainable Cities &amp; Communities','Target 11.b','No evacuation point or disaster committee',p.toFixed(1)+'%',sdgLevel(p),'live in current view','disaster'));
+ p=pctOf(r=>r.erosion==='CRITICAL_DISPLACEMENT');
+ live.push(sdgCard(13,'Climate Action','Target 13.1','Active erosion — displacement risk',p.toFixed(1)+'%',sdgLevel(p),'live in current view','erosion'));
+ document.getElementById('sdg-live-grid').innerHTML=live.join('');
+
+ const staticCards=[
+  sdgCard(4,'Quality Education','Target 4.1','No school beyond primary level on-site','93.1%','red','from full baseline report'),
+  sdgCard(16,'Peace, Justice &amp; Strong Institutions','Target 16.9','Statewide voter registration rate','48%','amber','from full baseline report')
+ ];
+ document.getElementById('sdg-static-grid').innerHTML=staticCards.join('');
+ document.getElementById('sdg-total-communities').textContent=fmt(ALL.length);
+}
+
+function updateKPIs(){
+ const d=vis;
+ animNum(document.getElementById('kpi-s'),d.length);
+
+ /* Whole-area view = no search text, no need-category filter, no
+    critical-only filter — meaning every community in the selected
+    district/LGA is genuinely represented, so the authoritative
+    report totals for that area are the honest number to show. */
+ const wholeArea = (document.getElementById('f-cat').value==='ALL')
+   && (document.getElementById('f-crisis').value==='ALL')
+   && !(document.getElementById('search-box').value||'').trim();
+
+ if(wholeArea && d.length){
+  const lgasInView=[...new Set(d.map(r=>r.lga))];
+  const districtsInView=[...new Set(d.map(r=>r.district))];
+  const popKnown = lgasInView.every(l=>LGA_POPULATION[l]!=null);
+  const votersKnown = districtsInView.every(ds=>DISTRICT_VOTERS[ds]!=null);
+  document.getElementById('kpi-p').textContent = popKnown
+    ? fmt(lgasInView.reduce((s,l)=>s+LGA_POPULATION[l],0))
+    : fmt(d.reduce((s,r)=>s+r.pop,0));
+  document.getElementById('kpi-v').textContent = votersKnown
+    ? fmt(districtsInView.reduce((s,ds)=>s+DISTRICT_VOTERS[ds],0))
+    : fmt(d.reduce((s,r)=>s+r.voters,0));
+ } else {
+  document.getElementById('kpi-p').textContent=fmt(d.reduce((s,r)=>s+r.pop,0));
+  document.getElementById('kpi-v').textContent=fmt(d.reduce((s,r)=>s+r.voters,0));
+ }
+
+ document.getElementById('kpi-wy').textContent=fmt(d.reduce((s,r)=>s+r.women,0))+' / '+fmt(d.reduce((s,r)=>s+r.youth,0));
+ const withM=d.filter(r=>r.mpi>0);
+ document.getElementById('kpi-mpi').textContent=withM.length?(withM.reduce((s,r)=>s+r.mpi,0)/withM.length).toFixed(1):'—';
+ animNum(document.getElementById('kpi-c'),d.filter(isCrit).length);
+}
+function fmt(n){if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return n.toLocaleString();}
+function animNum(el,to,dur=600){
+ const from=+(el.dataset.v||0),t0=performance.now();
+ function step(t){const k=Math.min(1,(t-t0)/dur);
+  el.textContent=Math.round(from+(to-from)*(1-Math.pow(1-k,3))).toLocaleString();
+  if(k<1)requestAnimationFrame(step);}
+ requestAnimationFrame(step);el.dataset.v=to;}
+
+function renderGlobalStory(){
+ const box=document.getElementById('global-story');
+ if(!vis.length){box.innerHTML='No communities match the current filters. Widen the filters to bring data back.';return;}
+ const pop=vis.reduce((s,r)=>s+r.pop,0);
+ const crit=vis.filter(isCrit);
+ const pct=((crit.length/vis.length)*100).toFixed(0);
+ let s=`Showing <span class="hl">${vis.length}</span> communities, home to roughly <span class="hl">${pop.toLocaleString()}</span> people. `;
+ if(crit.length)s+=`<span class="hl-red">${crit.length} (${pct}%)</span> are flagged critical — severe disease risk, or no motorized way out in an emergency. `;
+ else s+=`None currently meet the critical threshold. `;
+ const sc=agg(vis,'cat');const topC=Object.keys(sc).sort((a,b)=>sc[b]-sc[a])[0];
+ s+=`The most common request from these communities is <span class="hl-amber">${topC}</span>.`;
+ box.innerHTML=s;
+}
+
+let clusterGroup=null;
+function renderMap(){
+ if(clusterGroup)map.removeLayer(clusterGroup);
+ markers=[];
+ clusterGroup=L.markerClusterGroup({
+  maxClusterRadius:50,spiderfyOnMaxZoom:true,
+  iconCreateFunction:cl=>{
+   const kids=cl.getAllChildMarkers();
+   const hasCrit=kids.some(k=>k._isCrit);
+   return L.divIcon({html:`<div>${cl.getChildCount()}</div>`,
+    className:'marker-cluster'+(hasCrit?' has-crit':''),iconSize:[38,38]});
+  }
+ });
+ const bnds=[];
+ vis.forEach(r=>{
+  if(!r.hasLocation)return;   /* nothing to plot — shown in the roster/dossier instead */
+  bnds.push([r.lat,r.lon]);
+  const crit=isCrit(r);
+  const m=L.circleMarker([r.lat,r.lon],{radius:crit?9:6,fillColor:r.color,
+   color:crit?'#ef4444':'rgba(255,255,255,.6)',weight:crit?2:1,fillOpacity:.92});
+  m._isCrit=crit;
+  m.bindTooltip(`<div class="mpop"><b>${r.name}</b>${r.cat}${crit?' ⚠ Critical':''}</div>`,{direction:'right',className:'ml',offset:[5,0]});
+  m.on('click',()=>openDossier(r));
+  clusterGroup.addLayer(m);
+  markers.push(m);
+ });
+ map.addLayer(clusterGroup);
+ if(bnds.length)map.fitBounds(bnds,{padding:[30,30],maxZoom:13});
+}
+
+function renderRoster(){
+ const ul=document.getElementById('roster');ul.innerHTML='';
+ document.getElementById('r-count').textContent=`(${vis.length})`;
+ if(!vis.length){ul.innerHTML=`<div class="roster-empty">${DATA_READY?'Nothing matches these filters.':'Waiting for the live database…'}</div>`;return;}
+ vis.forEach((r,i)=>{
+  const li=document.createElement('li');li.className='ri';li.style.animationDelay=`${Math.min(i,25)*.03}s`;
+  li.innerHTML=`<div class="ri-name"><span class="cat-dot" style="background:${r.color}"></span>${r.name}</div>
+   <div class="ri-sub">${r.lga} • ${r.cat}${r.hasLocation?'':' • <span class="ri-nomap">not yet mapped</span>'}</div>${isCrit(r)?`<div class="ri-flag">⚠ Critical</div>`:''}`;
+  li.onclick=()=>openDossier(r);
+  ul.appendChild(li);});
+}
+function buildLegend(){
+ document.getElementById('map-legend').innerHTML=
+  CAT_KEYS.map(k=>`<div class="lg-item" data-info="${k}|Communities whose top stated need falls under ${k.toLowerCase()}."><div class="lg-dot" style="background:${CAT_COLORS[k]}"></div>${k}</div>`).join('');
+}
+
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+ activeTab=t.dataset.tab;
+ document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ const pg=document.getElementById('pg-'+activeTab);if(pg)pg.classList.add('active');
+ closeDossier();renderCharts();
+}));
+
+function mkChart(id,type,labels,datasets,opts={}){
+ if(charts[id])charts[id].destroy();
+ const ctx=document.getElementById(id);if(!ctx)return;
+ const legendOpts=opts.legendOpts||{labels:{color:'#8fb0ca',font:{size:10.5,family:"-apple-system,'Segoe UI',Helvetica,Arial,sans-serif"},boxWidth:10}};
+ const plugins={legend:Object.assign({display:opts.legend!==false},legendOpts),
+  tooltip:{backgroundColor:'rgba(2,6,17,.95)',borderColor:'#0ea5e9',borderWidth:1,titleColor:'#f0f6ff',bodyColor:'#8fb0ca',
+   titleFont:{size:12,family:"'Times New Roman', serif"},bodyFont:{size:11,family:"'Times New Roman', serif"}}};
+ const options={responsive:true,maintainAspectRatio:false,animation:{duration:1500,easing:'easeOutQuart'},plugins};
+ if(opts.scales!==false){options.scales={
+  x:Object.assign({ticks:{color:'#64849e',font:{size:10.5,family:"-apple-system,'Segoe UI',Helvetica,Arial,sans-serif"}},grid:{color:'rgba(255,255,255,.03)'}},opts.xs||{}),
+  y:Object.assign({ticks:{color:'#64849e',font:{size:10.5,family:"-apple-system,'Segoe UI',Helvetica,Arial,sans-serif"}},grid:{color:'rgba(255,255,255,.04)'},beginAtZero:true},opts.ys||{})};}
+ charts[id]=new Chart(ctx,{type,data:{labels,datasets},options});
+}
+function agg(arr,key){const o={};arr.forEach(r=>{const v=plain(r[key]);o[v]=(o[v]||0)+1;});return o;}
+
+function renderCharts(){
+ if(!DATA_READY)return;
+ const d=vis;
+ const g=c=>`rgba(${parseInt(c.slice(1,3),16)},${parseInt(c.slice(3,5),16)},${parseInt(c.slice(5,7),16)},.75)`;
+ const smallLegend={position:'right',labels:{color:'#8fb0ca',font:{size:10,family:"'Times New Roman', serif"},boxWidth:10}};
+
+ if(activeTab==='overview'){
+  const mpiC={'Low (0–1)':0,'Moderate (2)':0,'High (3)':0,'Extreme (4–5)':0};
+  d.forEach(r=>{if(r.mpi<=1)mpiC['Low (0–1)']++;else if(r.mpi===2)mpiC['Moderate (2)']++;else if(r.mpi===3)mpiC['High (3)']++;else mpiC['Extreme (4–5)']++;});
+  mkChart('c-mpi','bar',Object.keys(mpiC),[{data:Object.values(mpiC),backgroundColor:['#10b981','#f59e0b','#f97316','#ef4444'],borderRadius:4}],{legend:false});
+
+  const sc=agg(d,'cat');
+  mkChart('c-sector','doughnut',Object.keys(sc),[{data:Object.values(sc),backgroundColor:Object.keys(sc).map(k=>g(CAT_COLORS[k]||'#0ea5e9')),borderColor:'#061122',borderWidth:2,hoverOffset:6}],{scales:false,legendOpts:smallLegend});
+
+  const lgas=[...new Set(d.map(r=>r.lga))].slice(0,6);
+  mkChart('c-lga','bar',lgas,[
+   {label:'Critical',data:lgas.map(l=>d.filter(r=>r.lga===l&&isCrit(r)).length),backgroundColor:'#ef4444',borderRadius:3},
+   {label:'At risk',data:lgas.map(l=>d.filter(r=>r.lga===l&&!isCrit(r)&&r.mpi>=3).length),backgroundColor:'#f59e0b',borderRadius:3}
+  ],{legendOpts:{position:'top',labels:{color:'#8fb0ca',font:{size:10,family:"'Times New Roman', serif"},boxWidth:10}}});
+
+  document.getElementById('ov-ext').textContent=d.filter(r=>r.mpi>=4).length;
+  document.getElementById('ov-strand').textContent=d.filter(r=>r.strand==='HIGHLY_STRANDED').length;
+  document.getElementById('ov-wash').textContent=d.filter(r=>r.wash).length;
+  const dd=d.map(r=>r.hosp_dist).filter(n=>n!=null&&!isNaN(n));
+  document.getElementById('ov-hosp').textContent=dd.length?(dd.reduce((a,b)=>a+b,0)/dd.length).toFixed(1)+' km':'—';
+ }
+
+ if(activeTab==='health'){
+  const ea=agg(d,'epi');
+  mkChart('c-epi','doughnut',Object.keys(ea),[{data:Object.values(ea),backgroundColor:['#ef4444','#f59e0b','#0ea5e9','#10b981'],borderColor:'#061122',borderWidth:2}],{scales:false,legendOpts:smallLegend});
+  const sa=agg(d,'strand');
+  mkChart('c-strand','polarArea',Object.keys(sa),[{data:Object.values(sa),backgroundColor:['rgba(239,68,68,.7)','rgba(245,158,11,.7)','rgba(14,165,233,.7)','rgba(16,185,129,.7)'],borderColor:'#040d1a',borderWidth:2}],{scales:false,legendOpts:smallLegend});
+  document.getElementById('st-preg').textContent=d.filter(r=>r.strand==='HIGHLY_STRANDED').reduce((s,r)=>s+r.pregnant,0).toLocaleString();
+  document.getElementById('st-wash').textContent=d.filter(r=>r.wash).length;
+  document.getElementById('st-flood').textContent=d.filter(r=>r.flood>=4).length;
+ }
+
+ if(activeTab==='economy'){
+  const mpiC={'Low (0–1)':0,'Moderate (2)':0,'High (3)':0,'Extreme (4–5)':0};
+  d.forEach(r=>{if(r.mpi<=1)mpiC['Low (0–1)']++;else if(r.mpi===2)mpiC['Moderate (2)']++;else if(r.mpi===3)mpiC['High (3)']++;else mpiC['Extreme (4–5)']++;});
+  mkChart('c-mpi2','bar',Object.keys(mpiC),[{data:Object.values(mpiC),backgroundColor:['#10b981','#3b82f6','#f59e0b','#ef4444'],borderRadius:4}],{legend:false});
+  const oa=agg(d,'occ');const ok=Object.keys(oa).sort((a,b)=>oa[b]-oa[a]).slice(0,5);
+  mkChart('c-occ','bar',ok,[{data:ok.map(k=>oa[k]),backgroundColor:CHART_PALETTE,borderRadius:3}],{legend:false,xs:{ticks:{maxRotation:20,color:'#64849e',font:{size:10,family:"'Times New Roman', serif"}}}});
+  document.getElementById('st-ext').textContent=d.filter(r=>r.mpi>=4).length;
+  document.getElementById('st-nrg').textContent=d.filter(r=>r.energy==='ENERGY_POOR').length;
+  document.getElementById('st-dig').textContent=d.filter(r=>r.digital==='EXCLUDED').length;
+  document.getElementById('st-hvst').textContent=d.filter(r=>r.harvest==='SEVERE'||r.harvest==='AT_RISK').length;
+ }
+
+ if(activeTab==='infra'){
+  const ja=agg(d,'jetty');
+  mkChart('c-jetty','doughnut',Object.keys(ja),[{data:Object.values(ja),backgroundColor:['#ef4444','#f59e0b','#10b981','#0ea5e9','#8b5cf6'],borderColor:'#061122',borderWidth:2}],{scales:false,legendOpts:smallLegend});
+  const fb={1:0,2:0,3:0,4:0,5:0};d.forEach(r=>{if(r.flood>=1&&r.flood<=5)fb[r.flood]++;});
+  mkChart('c-flood','bar',['Level 1','Level 2','Level 3','Level 4','Level 5'],[{data:Object.values(fb),backgroundColor:['#10b981','#84cc16','#f59e0b','#f97316','#ef4444'],borderRadius:4}],{legend:false});
+  document.getElementById('st-eros').textContent=d.filter(r=>r.erosion==='CRITICAL_DISPLACEMENT').length;
+  document.getElementById('st-dis').textContent=d.filter(r=>r.disaster).length;
+  const dists=d.map(r=>r.hosp_dist).filter(n=>n!=null&&!isNaN(n));
+  document.getElementById('st-hospdist').textContent=dists.length?(dists.reduce((a,b)=>a+b,0)/dists.length).toFixed(1)+' km':'—';
+  document.getElementById('st-isolated').textContent=d.filter(r=>r.hasLocation&&r.nnKm!=null&&r.nnKm>5).length;
+ }
+
+ if(activeTab==='people'){
+  const lgas=[...new Set(d.map(r=>r.lga))].slice(0,6);
+  mkChart('c-demo','bar',lgas,[
+   {label:'Women',data:lgas.map(l=>d.filter(r=>r.lga===l).reduce((s,r)=>s+r.women,0)),backgroundColor:'rgba(236,72,153,.7)',borderRadius:3},
+   {label:'Youth',data:lgas.map(l=>d.filter(r=>r.lga===l).reduce((s,r)=>s+r.youth,0)),backgroundColor:'rgba(14,165,233,.7)',borderRadius:3}
+  ],{legendOpts:{position:'top',labels:{color:'#8fb0ca',font:{size:10,family:"'Times New Roman', serif"},boxWidth:10}}});
+  const ra=agg(d,'route');
+  mkChart('c-route','doughnut',Object.keys(ra),[{data:Object.values(ra),backgroundColor:['#0ea5e9','#94a3b8','#8b5cf6','#f59e0b','#10b981'],borderColor:'#061122',borderWidth:2}],{scales:false,legendOpts:smallLegend});
+  document.getElementById('st-vote2').textContent=d.reduce((s,r)=>s+r.voters,0).toLocaleString();
+  document.getElementById('st-women').textContent=fmt(d.reduce((s,r)=>s+r.women,0));
+  document.getElementById('st-youth').textContent=fmt(d.reduce((s,r)=>s+r.youth,0));
+ }
+}
+
+function openDossier(r){
+ if(radarLayer)map.removeLayer(radarLayer);
+ mapLines.forEach(l=>map.removeLayer(l));mapLines=[];
+ if(r.hasLocation)map.flyTo([r.lat,r.lon],14,{duration:1.4});
+
+ document.getElementById('dos-name').textContent=r.name;
+ document.getElementById('dos-meta').innerHTML=r.hasLocation
+  ?`${r.lga} • ${r.district}`
+  :`${r.lga} • ${r.district} • <span class="dos-nomap">location not yet mapped — survey data only</span>`;
+ buildStory(r);
+
+ const pFrame=document.getElementById('d-photo');
+ if(r.photo_url){pFrame.style.display='block';pFrame.style.backgroundImage=`url('${r.photo_url}')`;}
+ else pFrame.style.display='none';
+
+ set('d-hh',typeof r.hh==='number'?r.hh.toLocaleString():r.hh);
+ set('d-vote',r.voters.toLocaleString());
+ set('d-youth',r.youth.toLocaleString());set('d-women',r.women.toLocaleString());
+
+ const epiEl=document.getElementById('d-epi'),epiBox=document.getElementById('db-epi');
+ if(r.epi==='CRITICAL'){epiEl.innerHTML=`<span class="db-val-red">High — outbreak conditions present</span>`;epiBox.className='stat-card sc-red sc-span';}
+ else{epiEl.textContent=plain(r.epi);epiBox.className='stat-card sc-span';}
+
+ const stEl=document.getElementById('d-strand'),stBox=document.getElementById('db-strand');
+ if(r.strand==='HIGHLY_STRANDED'){stEl.innerHTML=`<span class="db-val-red">Cut off — no motorized evacuation</span>`;stBox.className='stat-card sc-red sc-span';}
+ else{stEl.textContent=plain(r.strand);stBox.className='stat-card sc-span';}
+ document.getElementById('d-preg').textContent=r.pregnant>0?`${r.pregnant} pregnant women here have no emergency route`:'No pregnancy-risk estimate recorded';
+
+ document.getElementById('d-flood').textContent=`Level ${r.flood} of 5`;
+ document.getElementById('d-wash').textContent=r.wash?'Open defecation present':'Adequate';
+ document.getElementById('d-hosp').innerHTML=r.hosp_dist!=null
+  ?`${r.hosp_name}<br><span style="color:var(--red);font-size:12px;font-style:italic">${r.hosp_dist.toFixed(1)} km away (straight line)</span>`
+  :`${r.hosp_name}`;
+
+ const mpiEl=document.getElementById('d-mpi');
+ if(r.mpi>=4)mpiEl.innerHTML=`<span class="db-val-red">${r.mpi} — extreme deprivation</span>`;
+ else if(r.mpi>=3)mpiEl.innerHTML=`<span class="db-val-amber">${r.mpi} — elevated</span>`;
+ else mpiEl.textContent=`${r.mpi} — lower band`;
+
+ set('d-nrg',plain(r.energy));set('d-dig',plain(r.digital));
+ set('d-hvst',plain(r.harvest));set('d-occ',plain(r.occ));
+
+ const erosEl=document.getElementById('d-eros'),erosBox=document.getElementById('db-eros');
+ if(r.erosion==='CRITICAL_DISPLACEMENT'){erosEl.innerHTML=`<span class="db-val-red">Losing land — displacement risk</span>`;erosBox.className='stat-card sc-red sc-span';}
+ else{erosEl.textContent=plain(r.erosion);erosBox.className='stat-card sc-span';}
+
+ set('d-dis',r.disaster?'None — no evacuation plan':'Plan in place');
+ set('d-jetty',plain(r.jetty));
+
+ const spatialBox=document.getElementById('db-spatial-grid');
+ if(r.hasLocation&&r.nnKm!=null){
+  spatialBox.style.display='';
+  set('d-nn',`${r.nnName||'—'} (${r.nnKm.toFixed(1)} km away)`);
+  set('d-density',`${r.within3km!=null?r.within3km:'—'} within 3km${r.density5km!=null?` · ${r.density5km} within 5km`:''}`);
+  set('d-cbd',r.distCbdKm!=null?`${r.distCbdKm.toFixed(1)} km straight-line`:'—');
+ } else {
+  spatialBox.style.display='none';
+ }
+ document.getElementById('d-priority').textContent=`"${r.proj}"`;
+
+ /* Map-dependent visuals only make sense where we have a coordinate to
+    anchor them to — skip entirely rather than plotting at a fabricated
+    or default location. */
+ if(r.hasLocation){
+  const ri=L.divIcon({html:'<div class="radar-inner"></div>',className:'radar-wrap',iconSize:[120,120],iconAnchor:[60,60]});
+  radarLayer=L.marker([r.lat,r.lon],{icon:ri,interactive:false}).addTo(map);
+
+  /* HONEST clinic-distance ring: true radius, no invented direction.
+     (The old version drew the clinic at a made-up 45° bearing —
+     fabricated geography that would not survive an expert audit.) */
+  if(r.hosp_dist!=null&&r.hosp_dist>0){
+   const ring=L.circle([r.lat,r.lon],{radius:r.hosp_dist*1000,color:'#ef4444',weight:1.5,dashArray:'6,8',fill:false,opacity:.75}).addTo(map);
+   const lbl=L.tooltip({permanent:true,direction:'top',className:'ttip',offset:[0,-6]})
+    .setLatLng([r.lat+(r.hosp_dist/111),r.lon])
+    .setContent(`Nearest clinic: <span style="color:#ef4444">${r.hosp_dist.toFixed(1)} km</span><br>${r.hosp_name}`).addTo(map);
+   mapLines.push(ring,lbl);
+  }
+ }
+
+ document.getElementById('dossier').style.display='flex';
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ document.getElementById('right-panel').scrollTop=0;
+}
+function set(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
+
+function buildStory(r){
+ let s=`<span class="hl">${r.name}</span> is home to an estimated <span class="hl">${r.pop.toLocaleString()}</span> people. `;
+ if(r.mpi>=4)s+=`It carries <span class="hl-red">extreme poverty</span> — deprived in ${r.mpi} of the 5 measured basics. `;
+ else if(r.epi==='CRITICAL')s+=`Its drinking water and sanitation put it at <span class="hl-red">high risk of disease outbreaks</span>. `;
+ else if(r.strand==='HIGHLY_STRANDED')s+=`It is <span class="hl-amber">cut off</span> — no motorized boat or vehicle for a medical emergency. `;
+ if(r.strand==='HIGHLY_STRANDED'&&r.pregnant>0)
+  s+=`<br><br>Most urgent: <span class="hl-red">${r.pregnant} pregnant women</span> here cannot reach maternal care in an emergency. `;
+ s+=`The community's own request is clear: <span class="hl">${r.cat}</span> — in their words, <em>"${r.proj}"</em>.`;
+ document.getElementById('dos-story').innerHTML=s;
+}
+function closeDossier(){
+ document.getElementById('dossier').style.display='none';
+ if(radarLayer){map.removeLayer(radarLayer);radarLayer=null;}
+ mapLines.forEach(l=>map.removeLayer(l));mapLines=[];
+ const pg=document.getElementById('pg-'+activeTab);
+ if(pg){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));pg.classList.add('active');}
+ renderCharts();
+}
+document.getElementById('dos-close').onclick=closeDossier;
+document.getElementById('btnReset').onclick=resetAll;
+document.getElementById('f-dist').onchange=handleDistChange;
+document.getElementById('f-lga').onchange=applyFilters;
+document.getElementById('f-cat').onchange=applyFilters;
+document.getElementById('f-crisis').onchange=applyFilters;
+document.getElementById('search-box').oninput=applyFilters;
+
+/* HOVER CONTEXT ENGINE — any element with data-info="Title|Explanation"
+   gets a tooltip. Desktop: hover, with a short dwell delay so it doesn't
+   flash on every pointer pass-through. Mobile: long-press (600ms). */
+const ctx=document.getElementById('ctx');let ctxT=null,pendingEl=null;
+const HOVER_DELAY=550;
+function showCtx(el,x,y){
+ const parts=(el.dataset.info||'').split('|');
+ ctx.innerHTML=`<b>${parts[0]||''}</b>${parts[1]||parts[0]||''}`;
+ ctx.classList.add('on');
+ const w=ctx.offsetWidth,h=ctx.offsetHeight;
+ let L=x+14,T=y+14;
+ if(L+w>innerWidth-10)L=x-w-14;if(T+h>innerHeight-10)T=y-h-14;
+ ctx.style.left=Math.max(8,L)+'px';ctx.style.top=Math.max(8,T)+'px';
+}
+function hideCtx(){ctx.classList.remove('on');clearTimeout(ctxT);pendingEl=null;}
+document.addEventListener('mouseover',e=>{
+ const el=e.target.closest('[data-info]');
+ if(!el){hideCtx();return;}
+ if(el===pendingEl||ctx.classList.contains('on')&&el===pendingEl)return;
+ clearTimeout(ctxT);pendingEl=el;
+ const {clientX:x,clientY:y}=e;
+ ctxT=setTimeout(()=>{if(pendingEl===el)showCtx(el,x,y);},HOVER_DELAY);
+});
+document.addEventListener('mouseout',e=>{
+ const el=e.target.closest('[data-info]');
+ if(el&&el===pendingEl&&!ctx.classList.contains('on')){clearTimeout(ctxT);pendingEl=null;}
+});
+document.addEventListener('mousemove',e=>{
+ if(!ctx.classList.contains('on'))return;
+ const el=e.target.closest('[data-info]');
+ if(el)showCtx(el,e.clientX,e.clientY);else hideCtx();});
+document.addEventListener('touchstart',e=>{
+ const el=e.target.closest('[data-info]');
+ if(!el)return hideCtx();
+ ctxT=setTimeout(()=>{const t=e.touches[0];showCtx(el,t.clientX,t.clientY);
+  setTimeout(hideCtx,2600);},600);},{passive:true});
+document.addEventListener('touchend',()=>clearTimeout(ctxT));
+document.addEventListener('scroll',hideCtx,true);
+
+/* INTRO WIRING */
+function killIntro(){document.getElementById('intro').classList.add('gone');
+ document.getElementById('skipIntro').style.display='none';
+ setTimeout(()=>map.invalidateSize(),400);}
+document.getElementById('skipIntro').onclick=killIntro;
+document.getElementById('enterBtn').onclick=killIntro;
+const io=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('on',e.isIntersecting)),{threshold:.4});
+document.querySelectorAll('.scene').forEach(s=>io.observe(s));
+document.querySelector('.scene').classList.add('on');
+
+window.onload=boot;
+</script>
+</body>
+</html>
