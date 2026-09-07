@@ -5,25 +5,26 @@ import { CATEGORY_COLORS } from "@/lib/constants";
 import { communitiesToGeoJson, type CommunityFeatureCollection } from "@/lib/geo";
 import type { AdministrativeFeatureCollection } from "@/lib/spatial";
 import { FIT_PADDING, LAGOS_BOUNDS, cameraDuration } from "@/lib/motion";
-import { BASEMAP_ATTRIBUTION, BASEMAP_TILES, paintFor } from "@/lib/basemap";
-import { useThemeName } from "./theme";
+import { BASEMAP_ATTRIBUTION, BASEMAP_TILES, paintFor, type BasemapKey } from "@/lib/basemap";
 import Link from "next/link";
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 
-type Basemap = "map" | "light" | "satellite";
+/**
+ * Satellite first. These are riverine settlements: imagery shows the water, the
+ * sandbars and the built footprint that a drawn canvas erases. The light canvas
+ * is the one alternative, for reading place names and boundaries.
+ */
+type Basemap = BasemapKey;
+const DEFAULT_BASEMAP: Basemap = "satellite";
 
 const tiles: Record<Basemap, { url: string; label: string; attribution: string }> = {
-  map: { url: BASEMAP_TILES.dark, label: "Dark", attribution: BASEMAP_ATTRIBUTION.canvas },
-  light: { url: BASEMAP_TILES.light, label: "Light", attribution: BASEMAP_ATTRIBUTION.canvas },
   satellite: {
     url: BASEMAP_TILES.satellite,
     label: "Satellite",
     attribution: BASEMAP_ATTRIBUTION.satellite,
   },
+  light: { url: BASEMAP_TILES.light, label: "Light", attribution: BASEMAP_ATTRIBUTION.canvas },
 };
-
-/** The basemap key as the shared paint helper names it. */
-const paintKey = (basemap: Basemap) => (basemap === "map" ? "dark" : basemap);
 
 /* --------------------------------------------------------------------------
    Community points
@@ -407,8 +408,7 @@ export function CommunityMap({
   const mapRef = useRef<import("maplibre-gl").Map | null>(null);
   const firstFit = useRef(false);
   const readyRef = useRef(false);
-  const theme = useThemeName();
-  const [basemap, setBasemap] = useState<Basemap>(theme === "warm" ? "light" : "map");
+  const [basemap, setBasemap] = useState<Basemap>(DEFAULT_BASEMAP);
   const basemapRef = useRef<Basemap>(basemap);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState(false);
@@ -517,7 +517,7 @@ export function CommunityMap({
                 id: "basemap",
                 type: "raster",
                 source: "basemap",
-                paint: paintFor(paintKey(basemapRef.current)),
+                paint: paintFor(basemapRef.current),
               },
             ],
           },
@@ -630,12 +630,7 @@ export function CommunityMap({
     }
   }, [communities, healthAccess, ready, activeSlug]);
 
-  /* ---- basemap follows the theme until the viewer overrides it ---- */
-  const basemapTouched = useRef(false);
-  useEffect(() => {
-    if (basemapTouched.current) return;
-    setBasemap(theme === "warm" ? "light" : "map");
-  }, [theme]);
+  /* ---- basemap ---- */
   useEffect(() => {
     basemapRef.current = basemap;
     const map = mapRef.current;
@@ -643,10 +638,10 @@ export function CommunityMap({
       | import("maplibre-gl").RasterTileSource
       | undefined;
     source?.setTiles([tiles[basemap].url]);
-    // Imagery keeps its own appearance; the canvas basemaps are dimmed so the
+    // Imagery keeps its own appearance; the canvas basemap is dimmed so the
     // community points stay the brightest thing on the map.
     if (map?.getLayer("basemap")) {
-      const paint = paintFor(paintKey(basemap));
+      const paint = paintFor(basemap);
       for (const [property, value] of Object.entries(paint)) {
         map.setPaintProperty("basemap", property as keyof typeof paint, value);
       }
@@ -769,10 +764,7 @@ export function CommunityMap({
               type="button"
               aria-pressed={basemap === item}
               className={basemap === item ? "active" : ""}
-              onClick={() => {
-                basemapTouched.current = true;
-                setBasemap(item);
-              }}
+              onClick={() => setBasemap(item)}
               key={item}
             >
               {tiles[item].label}

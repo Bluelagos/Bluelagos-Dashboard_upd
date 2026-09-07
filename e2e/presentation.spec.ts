@@ -10,9 +10,7 @@ test.describe("theme", () => {
   test("switches and persists across a reload", async ({ page }) => {
     await page.goto("/");
     const root = page.locator("html");
-    await expect(root).toHaveAttribute("data-theme", /deep|warm/);
-
-    await page.getByRole("button", { name: /Warm Coast/ }).click();
+    // Coastal Day is the default, regardless of the machine's colour scheme.
     await expect(root).toHaveAttribute("data-theme", "warm");
 
     await page.reload();
@@ -26,7 +24,7 @@ test.describe("theme", () => {
 
   test("applies before first paint, with no flash of the wrong theme", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("button", { name: /Warm Coast/ }).click();
+    await page.getByRole("button", { name: /Coastal Day/ }).click();
     await page.goto("/health");
     // Read immediately on the new document rather than after settling.
     await expect(page.locator("html")).toHaveAttribute("data-theme", "warm");
@@ -34,7 +32,7 @@ test.describe("theme", () => {
 
   test("carries into a second page and the briefing", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("button", { name: /Warm Coast/ }).click();
+    await page.getByRole("button", { name: /Coastal Day/ }).click();
     await page.goto("/briefing");
     await expect(page.locator("html")).toHaveAttribute("data-theme", "warm");
   });

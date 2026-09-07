@@ -11,7 +11,7 @@
 > when you expect to be interrupted and want to follow the question.
 >
 > **Before you begin:** set the appearance from the top bar — **Deep Coast** for
-> a bright projector, **Warm Coast** for a lit room. The choice is remembered.
+> a bright projector, **Coastal Day** for a lit room. The choice is remembered.
 
 ---
 

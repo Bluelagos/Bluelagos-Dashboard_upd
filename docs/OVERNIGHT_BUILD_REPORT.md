@@ -90,7 +90,7 @@ Not done (see §13): WorldPop, Earth Engine EO, navigable-network routing, deck.
 - `SnapshotBanner` / `SystemStatus` render the state visibly. Never a silent swap.
 - **Verified**: rebuilt with an unreachable database URL → every route returns 200 and shows the VERIFIED SNAPSHOT banner; then restored and rebuilt with the real config.
 - `npm run presentation:check` → read-only status board; currently reports **Presentation check passed**.
-- Map: default dark basemap (non-satellite) means a tile-provider outage does not break the demo; boundaries, points and analysis remain.
+- Map: satellite imagery is the default basemap, with a light canvas as the one alternative; a tile-provider outage still leaves boundaries, points and analysis on screen.
 
 ## 11. Tests — final numbers
 

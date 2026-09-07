@@ -15,9 +15,13 @@ import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { MapPin, Route, Users, ShieldAlert } from "lucide-react";
 
 
-/** Keyless Esri canvas basemaps, matched to the current appearance. */
-const BASEMAPS = { deep: BASEMAP_TILES.dark, warm: BASEMAP_TILES.light } as const;
-const BASEMAP_PAINT = { deep: paintFor("dark"), warm: paintFor("light") } as const;
+/**
+ * Keyless Esri basemaps, matched to the current appearance. There is no dark
+ * canvas any more, so the dark appearance falls back to imagery, which reads
+ * correctly against a night palette instead of glaring white.
+ */
+const BASEMAPS = { deep: BASEMAP_TILES.satellite, warm: BASEMAP_TILES.light } as const;
+const BASEMAP_PAINT = { deep: paintFor("satellite"), warm: paintFor("light") } as const;
 
 const LABELS: Record<InterventionType, string> = {
   health: "Health centre",

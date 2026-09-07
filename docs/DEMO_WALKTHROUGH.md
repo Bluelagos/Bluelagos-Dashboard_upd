@@ -14,7 +14,7 @@
 
 **Before you start:** open the theme toggle in the top bar and pick the
 appearance that suits the room. **Deep Coast** (moon icon) is better on a bright
-projector; **Warm Coast** (sun icon) is better on a screen in a well-lit room or
+projector; **Coastal Day** (sun icon) is better on a screen in a well-lit room or
 in a printed screenshot. The choice persists.
 
 ---

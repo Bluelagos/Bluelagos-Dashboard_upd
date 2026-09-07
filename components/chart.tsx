@@ -160,7 +160,7 @@ export function Chart({
 
 /**
  * Chart styling built from the live design tokens. Call this inside a `useMemo`
- * keyed on the theme so charts follow Deep Coast / Warm Coast automatically.
+ * keyed on the theme so charts follow Deep Coast / Coastal Day automatically.
  */
 export function chartThemeFor() {
   const text = token("--text-secondary", "#88a0b2");
@@ -192,7 +192,7 @@ export function chartThemeFor() {
 /** Hook form: rebuilds the theme object whenever the appearance changes. */
 export function useChartTheme() {
   const theme = useThemeName();
-  // Resolved from the live CSS variables, so it follows Deep Coast / Warm Coast.
+  // Resolved from the live CSS variables, so it follows Deep Coast / Coastal Day.
   // eslint-disable-next-line react-hooks/exhaustive-deps -- `theme` is the input; chartThemeFor reads it from the document.
   return useMemo(() => chartThemeFor(), [theme]);
 }

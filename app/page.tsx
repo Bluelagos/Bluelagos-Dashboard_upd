@@ -5,12 +5,16 @@ import {
   Building2,
   CloudRain,
   Droplets,
+  GraduationCap,
   HeartPulse,
+  Home,
   LifeBuoy,
   MapPin,
   Network,
   ShieldAlert,
+  UserRound,
   Users,
+  Vote,
   Waves,
 } from "lucide-react";
 import { CommunityMap } from "@/components/community-map";
@@ -27,7 +31,12 @@ import {
   WhatToLookAt,
   NeedScore,
 } from "@/components/ui";
-import { aggregateKnown, filterCommunities, formatNumber } from "@/lib/analytics";
+import {
+  aggregateHouseholdFloor,
+  aggregateKnown,
+  filterCommunities,
+  formatNumber,
+} from "@/lib/analytics";
 import { getCommunities } from "@/lib/data";
 import type { DashboardSearchParams } from "@/lib/domain";
 import { parseDashboardFilters } from "@/lib/filters";
@@ -54,6 +63,10 @@ export default async function Overview({
   const sanitation = rows.filter((c) => c.sanitationDeficit === true).length;
   const highFlood = rows.filter((c) => c.floodHazard !== null && c.floodHazard >= 4).length;
   const population = aggregateKnown(rows, "population");
+  const households = aggregateHouseholdFloor(rows);
+  const voters = aggregateKnown(rows, "voters");
+  const women = aggregateKnown(rows, "women");
+  const youth = aggregateKnown(rows, "youth");
 
   const takeaway = overviewTakeaway(rows);
 
@@ -78,7 +91,7 @@ export default async function Overview({
 
       <Filters communities={all} filters={filters} />
 
-      <div className="grid kpi-grid">
+      <div className="grid kpi-grid kpi-grid-wide">
         <Kpi
           label="Communities surveyed"
           value={formatNumber(rows.length)}
@@ -102,6 +115,62 @@ export default async function Overview({
           href="/demographics"
           action="See the people page"
           metric="population"
+        />
+        <Kpi
+          label="Households represented"
+          value={households.value === null ? "Unavailable" : `at least ${formatNumber(households.value)}`}
+          note={
+            households.unknownCount
+              ? `Floor implied by the bands ${households.knownCount} communities reported; ${households.unknownCount} gave none`
+              : "Floor implied by the household band each community reported"
+          }
+          tone="infrastructure"
+          icon={<Home aria-hidden="true" />}
+          href="/demographics"
+          action="See the people page"
+          metric="households"
+        />
+        <Kpi
+          label="Registered voters"
+          value={formatNumber(voters.value)}
+          note={
+            voters.unknownCount
+              ? `${voters.knownCount} communities gave a figure; ${voters.unknownCount} did not`
+              : `Reported across ${rows.length} surveyed communities`
+          }
+          tone="survey"
+          icon={<Vote aria-hidden="true" />}
+          href="/sdgs"
+          action="See civic access"
+          metric="voters"
+        />
+        <Kpi
+          label="Women recorded"
+          value={formatNumber(women.value)}
+          note={
+            women.unknownCount
+              ? `${women.knownCount} communities gave a figure; ${women.unknownCount} did not`
+              : `Reported across ${rows.length} surveyed communities`
+          }
+          tone="people"
+          icon={<UserRound aria-hidden="true" />}
+          href="/demographics"
+          action="See the people page"
+          metric="women"
+        />
+        <Kpi
+          label="Youth aged 18 to 35"
+          value={formatNumber(youth.value)}
+          note={
+            youth.unknownCount
+              ? `${youth.knownCount} communities gave a figure; ${youth.unknownCount} did not`
+              : `Reported across ${rows.length} surveyed communities`
+          }
+          tone="livelihoods"
+          icon={<GraduationCap aria-hidden="true" />}
+          href="/economy"
+          action="Open livelihoods"
+          metric="youth"
         />
         <Kpi
           label="Needs urgent attention"

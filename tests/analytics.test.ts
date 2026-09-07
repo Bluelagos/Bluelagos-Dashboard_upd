@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  aggregateHouseholdFloor,
   aggregateKnown,
+  householdFloor,
   baselinePriorityScore,
   filterCommunities,
   isCritical,
@@ -153,3 +155,30 @@ function record(overrides: Record<string, unknown>) {
   if (!result.record) throw new Error("Fixture parsing failed");
   return result.record;
 }
+
+describe("household bands", () => {
+  it("reads the lower edge of a band and never invents a midpoint", () => {
+    expect(householdFloor("101- 150")).toBe(101);
+    expect(householdFloor("50 -  100")).toBe(50);
+    expect(householdFloor("Above 1000")).toBe(1000);
+    expect(householdFloor("Below 50")).toBe(0);
+    expect(householdFloor(null)).toBeNull();
+    expect(householdFloor("   ")).toBeNull();
+    expect(householdFloor("not a band")).toBeNull();
+  });
+
+  it("sums a floor and reports the communities that gave no band as unknown", () => {
+    const aggregate = aggregateHouseholdFloor([
+      community({ households: "101- 150" }),
+      community({ households: "Above 1000" }),
+      community({ households: "Below 50" }),
+      community({ households: null }),
+    ]);
+    expect(aggregate.value).toBe(1101);
+    expect(aggregate.knownCount).toBe(3);
+    expect(aggregate.unknownCount).toBe(1);
+  });
+
+  it("reports no floor at all when nothing was banded", () =>
+    expect(aggregateHouseholdFloor([community({ households: null })]).value).toBeNull());
+});

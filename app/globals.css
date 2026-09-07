@@ -2,8 +2,8 @@
    BLUE LAGOS — DESIGN SYSTEM
    --------------------------------------------------------------------------
    Two complete themes share one set of semantic tokens:
+     [data-theme="warm"]  Coastal Day — cool off-white policy-report light (DEFAULT)
      [data-theme="deep"]  Deep Coast  — night lagoon, controlled colour variety
-     [data-theme="warm"]  Warm Coast  — cream policy-report / map-room light
 
    Components must consume the SEMANTIC tokens below (--surface, --text,
    --accent-health, ...) and never a raw hex value, so both themes stay
@@ -11,9 +11,78 @@
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   1. THEME 1 — DEEP COAST (default)
+   1. THEME 1 — COASTAL DAY (default)
+   --------------------------------------------------------------------------
+   A cool, deeper off-white rather than a cream. The ground sits well below
+   paper white so panels read as raised surfaces without needing heavy borders,
+   and every neutral carries a blue-grey cast so it sits with the lagoon blues
+   and the satellite basemap instead of fighting them.
    -------------------------------------------------------------------------- */
 :root,
+[data-theme="warm"] {
+  color-scheme: light;
+
+  --bg: #dfe6ea;
+  --bg-wash-1: rgba(13, 106, 160, 0.06);
+  --bg-wash-2: rgba(13, 133, 126, 0.05);
+  --grid-line: rgba(18, 44, 60, 0.03);
+  --surface: #f2f6f8;
+  --surface-raised: #fbfdfe;
+  --surface-inset: #e7eef2;
+  --surface-hover: #dde7ec;
+  --surface-tint-blue: rgba(13, 106, 160, 0.07);
+  --surface-tint-teal: rgba(13, 133, 126, 0.07);
+  --surface-tint-warm: rgba(158, 111, 30, 0.08);
+  --surface-tint-critical: rgba(170, 66, 55, 0.07);
+
+  --border: #c3d0d8;
+  --border-soft: rgba(195, 208, 216, 0.78);
+  --border-strong: #9cafba;
+
+  --text: #0d1f29;
+  --text-secondary: #3e5765;
+  --text-faint: #607685;
+  --text-inverse: #f6fafc;
+
+  --brand: #0d6aa0;
+  --brand-strong: #0a5079;
+  --brand-secondary: #0d857e;
+
+  --accent-survey: #0d6aa0;
+  --accent-water: #0d857e;
+  --accent-people: #545bb0;
+  --accent-health: #14705f;
+  --accent-environment: #5c7a2c;
+  --accent-infrastructure: #9a6d1c;
+  --accent-livelihoods: #93502e;
+
+  --critical: #ab4234;
+  --critical-ink: #862f24;
+  --critical-surface: #f6e8e5;
+  --critical-border: #d9b3aa;
+  --warning: #916013;
+  --warning-ink: #734c0f;
+  --warning-surface: #f4ecda;
+  --warning-border: #d9c496;
+  --positive: #27734c;
+  --positive-surface: #e6f0e9;
+  --positive-border: #aecdbb;
+  --info-surface: #e5eff5;
+  --info-border: #b6cfdf;
+
+  --map-ground: #d3dde3;
+  --map-panel: rgba(242, 246, 248, 0.95);
+
+  --shadow-card: 0 1px 2px rgba(13, 31, 41, 0.07);
+  --shadow-raised: 0 10px 26px -14px rgba(13, 31, 41, 0.34);
+  --shadow-overlay: 0 24px 60px -22px rgba(13, 31, 41, 0.42);
+  --scrim: rgba(13, 31, 41, 0.46);
+  --focus-ring: #0a6099;
+}
+
+/* --------------------------------------------------------------------------
+   2. THEME 2 — DEEP COAST
+   -------------------------------------------------------------------------- */
 [data-theme="deep"] {
   color-scheme: dark;
 
@@ -81,70 +150,6 @@
   --shadow-overlay: 0 24px 60px -20px rgba(0, 0, 0, 0.8);
   --scrim: rgba(3, 10, 16, 0.6);
   --focus-ring: #8be5ff;
-}
-
-/* --------------------------------------------------------------------------
-   2. THEME 2 — WARM COAST
-   -------------------------------------------------------------------------- */
-[data-theme="warm"] {
-  color-scheme: light;
-
-  --bg: #f2ece1;
-  --bg-wash-1: rgba(14, 111, 168, 0.05);
-  --bg-wash-2: rgba(15, 141, 132, 0.04);
-  --grid-line: rgba(20, 45, 62, 0.022);
-  --surface: #fffdf8;
-  --surface-raised: #ffffff;
-  --surface-inset: #f7f2e8;
-  --surface-hover: #f1eade;
-  --surface-tint-blue: rgba(14, 111, 168, 0.055);
-  --surface-tint-teal: rgba(15, 141, 132, 0.055);
-  --surface-tint-warm: rgba(181, 130, 42, 0.075);
-  --surface-tint-critical: rgba(184, 76, 63, 0.06);
-
-  --border: #ddd0ba;
-  --border-soft: rgba(221, 208, 186, 0.8);
-  --border-strong: #bfab90;
-
-  --text: #12242f;
-  --text-secondary: #47606f;
-  --text-faint: #6b7f8b;
-  --text-inverse: #fffdf8;
-
-  --brand: #0e6fa8;
-  --brand-strong: #0a557f;
-  --brand-secondary: #0f8d84;
-
-  --accent-survey: #0e6fa8;
-  --accent-water: #0f8d84;
-  --accent-people: #5a5eb8;
-  --accent-health: #16786a;
-  --accent-environment: #64802f;
-  --accent-infrastructure: #a5751f;
-  --accent-livelihoods: #9c5732;
-
-  --critical: #b3453a;
-  --critical-ink: #8e3227;
-  --critical-surface: #faeeeb;
-  --critical-border: #e0bab1;
-  --warning: #9a6716;
-  --warning-ink: #7a5211;
-  --warning-surface: #faf1dd;
-  --warning-border: #e2cd9c;
-  --positive: #2c7a52;
-  --positive-surface: #ecf5ef;
-  --positive-border: #b6d4c2;
-  --info-surface: #ecf3f8;
-  --info-border: #c0d7e6;
-
-  --map-ground: #e9e2d5;
-  --map-panel: rgba(255, 253, 248, 0.95);
-
-  --shadow-card: 0 1px 2px rgba(38, 30, 18, 0.06);
-  --shadow-raised: 0 10px 26px -14px rgba(38, 30, 18, 0.3);
-  --shadow-overlay: 0 24px 60px -22px rgba(38, 30, 18, 0.38);
-  --scrim: rgba(46, 38, 26, 0.42);
-  --focus-ring: #0b6ea6;
 }
 
 /* --------------------------------------------------------------------------
@@ -461,7 +466,10 @@ button, a { color: inherit; }
 /* --------------------------------------------------------------------------
    12. KPI CARDS
    -------------------------------------------------------------------------- */
-.kpi-grid { grid-template-columns: repeat(6, 1fr); }
+.kpi-grid { grid-template-columns: repeat(6, 1fr); gap: 10px; }
+/* The overview carries ten headline figures; five to a row keeps both rows
+   even, and the card below is compact enough for both to clear the fold. */
+.kpi-grid.kpi-grid-wide { grid-template-columns: repeat(5, 1fr); }
 /* The card and its info button share one grid cell, so the button can sit on
    the card without nesting a button inside a link. */
 .kpi-cell { position: relative; display: flex; }
@@ -469,7 +477,7 @@ button, a { color: inherit; }
 .kpi {
   position: relative; display: flex; flex-direction: column;
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 14px 15px 13px; min-height: 106px; overflow: hidden;
+  border-radius: var(--radius); padding: 11px 12px 10px; min-height: 92px; overflow: hidden;
   text-align: left; text-decoration: none; color: inherit;
   transition: border-color var(--motion-fast) var(--ease), transform var(--motion-fast) var(--ease),
               box-shadow var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease);
@@ -481,16 +489,16 @@ button, a { color: inherit; }
 .kpi-tinted { background: linear-gradient(115deg, var(--tone-wash, transparent), transparent 60%), var(--surface); }
 .kpi-label {
   display: flex; align-items: center; gap: 8px; color: var(--text-secondary);
-  font-size: 11.5px; font-weight: 600; line-height: 1.35; padding-right: 20px;
+  font-size: 11px; font-weight: 600; line-height: 1.3; padding-right: 18px;
 }
 .kpi-chip {
-  width: 22px; height: 22px; flex: none; display: grid; place-items: center;
+  width: 20px; height: 20px; flex: none; display: grid; place-items: center;
   border-radius: 6px; background: var(--tone-wash, var(--surface-tint-blue));
   color: var(--tone, var(--accent-survey));
 }
-.kpi-chip svg { width: 13px; }
-.kpi-value { font-size: 26px; font-weight: 600; letter-spacing: -0.035em; margin: 11px 0 4px; line-height: 1.05; }
-.kpi-note { font-size: 11px; color: var(--text-faint); line-height: 1.45; margin-top: auto; }
+.kpi-chip svg { width: 12px; }
+.kpi-value { font-size: 22px; font-weight: 600; letter-spacing: -0.035em; margin: 8px 0 3px; line-height: 1.05; }
+.kpi-note { font-size: 10.5px; color: var(--text-faint); line-height: 1.4; margin-top: auto; }
 .kpi-info {
   position: absolute; top: 9px; right: 9px; width: 22px; height: 22px;
   border: 0; border-radius: 5px; background: transparent; color: var(--text-faint);
@@ -507,7 +515,7 @@ a.kpi:hover, button.kpi:hover {
   box-shadow: var(--shadow-raised); background: var(--surface-raised);
 }
 .kpi-go {
-  display: inline-flex; align-items: center; gap: 4px; margin-top: 8px;
+  display: inline-flex; align-items: center; gap: 4px; margin-top: 6px;
   color: var(--tone, var(--brand)); font-size: 11px; font-weight: 600;
   opacity: 0; transform: translateX(-3px);
   transition: opacity var(--motion-fast) var(--ease), transform var(--motion-fast) var(--ease);
@@ -1100,8 +1108,11 @@ button.kpi:hover .kpi-go, button.kpi:focus-visible .kpi-go { opacity: 1; transfo
    -------------------------------------------------------------------------- */
 .mobile-only { display: none; }
 
+@media (max-width: 1600px) {
+  .kpi-grid, .kpi-grid.kpi-grid-wide { grid-template-columns: repeat(4, 1fr); }
+}
 @media (max-width: 1400px) {
-  .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+  .kpi-grid, .kpi-grid.kpi-grid-wide { grid-template-columns: repeat(3, 1fr); }
   .theme-cards { grid-template-columns: repeat(3, 1fr); }
 }
 @media (max-width: 1200px) {
@@ -1136,7 +1147,7 @@ button.kpi:hover .kpi-go, button.kpi:focus-visible .kpi-go { opacity: 1; transfo
   .topbar { padding: 0 12px; }
   .page-head { align-items: flex-start; flex-direction: column; gap: 10px; }
   .page-head h1 { font-size: 23px; }
-  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .kpi-grid, .kpi-grid.kpi-grid-wide { grid-template-columns: repeat(2, 1fr); }
   .kpi { min-height: 96px; }
   .kpi-value { font-size: 22px; }
   .theme-cards, .detail-grid, .evidence-grid, .provenance dl,

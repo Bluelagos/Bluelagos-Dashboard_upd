@@ -357,6 +357,35 @@ export const aggregateKnown = (
       : 0,
   };
 };
+/**
+ * Households are collected as a band ("101- 150", "Above 1000"), never as a
+ * count, so they cannot be summed. `householdFloor` reads the LOWER edge of the
+ * band, which lets the platform state a floor — "at least this many households"
+ * — without inventing a midpoint the survey never recorded. "Below 50" has no
+ * lower edge worth claiming, so it contributes nothing to the floor.
+ */
+export function householdFloor(band: string | null): number | null {
+  if (!band) return null;
+  const cleaned = band.trim();
+  if (!cleaned) return null;
+  if (/^below/i.test(cleaned)) return 0;
+  const first = cleaned.match(/\d+/);
+  return first ? Number(first[0]) : null;
+}
+
+/** Communities that reported a band, and the household floor they imply. */
+export const aggregateHouseholdFloor = (rows: Community[]): NullableAggregate => {
+  const floors = rows
+    .map((row) => householdFloor(row.households))
+    .filter((value): value is number => value !== null);
+  return {
+    value: floors.length ? floors.reduce((sum, value) => sum + value, 0) : null,
+    knownCount: floors.length,
+    unknownCount: rows.length - floors.length,
+    completeness: rows.length ? Math.round((floors.length / rows.length) * 100) : 0,
+  };
+};
+
 export const sumKnown = (
   rows: Community[],
   key: "population" | "women" | "youth" | "voters" | "pregnanciesAtRisk",

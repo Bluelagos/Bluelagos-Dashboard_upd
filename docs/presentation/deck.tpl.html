@@ -1,0 +1,1247 @@
+<title>Blue Lagos Riverine Briefing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+/* ==========================================================================
+   BLUE LAGOS — RIVERINE BRIEFING
+   A presentation deck. Single visual world on purpose: slides carry their own
+   ground on a projector regardless of the viewer's theme, so every colour is
+   painted explicitly rather than inherited.
+   --------------------------------------------------------------------------
+   Palette   ink #04121b · shelf #0a1e2b · chalk #eaf3f7 · mist #90aabb
+             tide #3fb9e6 (Lagos blue) · reed #2fc2b0 · sand #e9b45c · coral #f0736f
+   Type      Archivo (display / structure) · Newsreader (reading)
+             IBM Plex Mono (labels, figures, coordinates)
+   Layout    Fixed 16:9 stage; one slide visible at a time; everything inside
+             sized in container-query units so a slide is identical at any
+             projector resolution.
+   ========================================================================== */
+
+:root {
+  --ink: #04121b;
+  --ink-2: #071a26;
+  --shelf: #0a1e2b;
+  --shelf-2: #0e2734;
+  --line: #16394c;
+  --line-soft: rgba(22, 57, 76, 0.62);
+  --chalk: #eaf3f7;
+  --mist: #90aabb;
+  --dim: #64818f;
+  --tide: #3fb9e6;
+  --tide-deep: #1c7ba6;
+  --reed: #2fc2b0;
+  --sand: #e9b45c;
+  --coral: #f0736f;
+  --coral-deep: #8f3b39;
+
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --read: "Newsreader", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--chalk);
+  font-family: var(--read);
+  overflow: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   Stage — the 16:9 frame everything is composed inside
+   -------------------------------------------------------------------------- */
+.stage {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(ellipse 90% 60% at 78% -12%, rgba(63, 185, 230, 0.10), transparent 62%),
+    radial-gradient(ellipse 70% 50% at 4% 108%, rgba(47, 194, 176, 0.08), transparent 60%),
+    var(--ink);
+  padding: 0;
+}
+
+.slide {
+  position: relative;
+  width: min(100vw, calc(100vh * 16 / 9));
+  height: min(100vh, calc(100vw * 9 / 16));
+  container-type: size;
+  container-name: slide;
+  background: var(--ink);
+  overflow: hidden;
+  display: none;
+}
+.slide.is-current { display: block; }
+
+/* Every slide is one padded grid; sub-layouts sit inside .body. */
+.frame {
+  position: absolute;
+  inset: 0;
+  padding: 5.2cqh 5cqw 4.4cqh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 2.6cqh;
+}
+
+/* --------------------------------------------------------------------------
+   Slide furniture
+   -------------------------------------------------------------------------- */
+.rail {
+  display: flex;
+  align-items: baseline;
+  gap: 1.4cqw;
+  font-family: var(--mono);
+  font-size: 1.15cqw;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.rail .part { color: var(--tide); }
+.rail .sep { color: var(--line); }
+.rail .src { margin-left: auto; letter-spacing: 0.1em; text-transform: none; font-size: 1.05cqw; }
+
+h1, h2, h3 { margin: 0; font-family: var(--display); text-wrap: balance; }
+
+.slide h2 {
+  font-size: 3.9cqw;
+  font-weight: 700;
+  letter-spacing: -0.028em;
+  line-height: 1.04;
+}
+.deck-lede {
+  margin: 0.9cqh 0 0;
+  font-size: 1.62cqw;
+  line-height: 1.5;
+  font-weight: 300;
+  color: var(--mist);
+  max-width: 58ch;
+}
+
+.foot {
+  display: flex;
+  align-items: center;
+  gap: 1.2cqw;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 1.5cqh;
+  font-family: var(--mono);
+  font-size: 1.02cqw;
+  color: var(--dim);
+  letter-spacing: 0.03em;
+}
+.foot b { color: var(--mist); font-weight: 500; }
+.foot .num { margin-left: auto; color: var(--line); letter-spacing: 0.12em; }
+
+/* --------------------------------------------------------------------------
+   Shared content objects
+   -------------------------------------------------------------------------- */
+.body { min-height: 0; display: grid; gap: 2.4cqw; align-content: start; }
+.cols-2 { grid-template-columns: 1fr 1fr; }
+.cols-photo { grid-template-columns: 1.55fr 1fr; }
+.cols-photo-l { grid-template-columns: 1fr 1.55fr; }
+.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.stack { display: grid; gap: 1.6cqh; align-content: start; min-height: 0; }
+
+p.read {
+  margin: 0;
+  font-size: 1.42cqw;
+  line-height: 1.62;
+  font-weight: 300;
+  color: #c6d8e1;
+  max-width: 62ch;
+}
+p.read strong { color: var(--chalk); font-weight: 500; }
+.small { font-size: 1.18cqw; line-height: 1.55; color: var(--mist); font-weight: 300; margin: 0; }
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 1.02cqw;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--tide);
+}
+
+/* Figure — the recurring "big number" object. Used only where the figure is
+   the argument, not as decoration on every slide. */
+.figs { display: grid; gap: 1.4cqw; }
+.fig { display: grid; gap: 0.5cqh; align-content: start; border-left: 2px solid var(--tide-deep); padding-left: 1.1cqw; }
+.fig .v {
+  font-family: var(--display);
+  font-size: 3.4cqw;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.fig .k { font-family: var(--mono); font-size: 0.98cqw; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mist); }
+.fig .n { font-size: 1.05cqw; color: var(--dim); font-weight: 300; line-height: 1.4; }
+.fig.sm .v { font-size: 2.5cqw; }
+.fig.tide { border-color: var(--tide); }
+.fig.tide .v { color: var(--tide); }
+.fig.reed { border-color: var(--reed); }
+.fig.reed .v { color: var(--reed); }
+.fig.sand { border-color: var(--sand); }
+.fig.sand .v { color: var(--sand); }
+.fig.coral { border-color: var(--coral); }
+.fig.coral .v { color: var(--coral); }
+
+/* Bar rows — one scale, 0 to 100% of communities, labelled at the value. */
+.bars { display: grid; gap: 1.15cqh; }
+.bar { display: grid; grid-template-columns: 15cqw 1fr auto; align-items: center; gap: 1.1cqw; }
+.bar .lab { font-size: 1.16cqw; color: var(--mist); font-weight: 300; line-height: 1.25; }
+.bar .track { height: 1.6cqh; background: #123243; border: 1px solid var(--line); border-radius: 0.2cqh; overflow: hidden; }
+.bar .fill { height: 100%; background: linear-gradient(90deg, var(--tide-deep), var(--tide)); border-radius: 0.2cqh; }
+.bar .fill.coral { background: linear-gradient(90deg, var(--coral-deep), var(--coral)); }
+.bar .fill.reed { background: linear-gradient(90deg, #1a7f74, var(--reed)); }
+.bar .fill.sand { background: linear-gradient(90deg, #96712f, var(--sand)); }
+.bar .val { font-family: var(--mono); font-size: 1.24cqw; font-variant-numeric: tabular-nums; color: var(--chalk); min-width: 5cqw; text-align: right; }
+.bar-scale {
+  display: flex; justify-content: space-between;
+  font-family: var(--mono); font-size: 0.92cqw; color: var(--dim);
+  border-top: 1px solid var(--line-soft); padding-top: 0.6cqh; margin-top: 0.4cqh;
+  margin-left: calc(15cqw + 1.1cqw); margin-right: calc(5cqw + 1.1cqw);
+}
+
+/* Plates — photographs. The field archive is almost entirely portrait, so the
+   deck uses upright plates rather than cropping them into letterbox strips. */
+.plate { position: relative; overflow: hidden; background: var(--shelf); border-radius: 0.3cqw; }
+.plate img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(0.94) contrast(1.03); }
+.plate figcaption {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 3.2cqh 1cqw 0.9cqh;
+  background: linear-gradient(transparent, rgba(4, 18, 27, 0.94) 62%);
+  font-family: var(--mono); font-size: 0.92cqw; letter-spacing: 0.03em;
+  color: #b9cfda; line-height: 1.35;
+}
+.plate-strip { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0.7cqw; }
+.plate-strip .plate { aspect-ratio: 3 / 4; }
+
+/* Panels — reserved for objects that genuinely stand apart from the page. */
+.panel {
+  background: var(--shelf);
+  border: 1px solid var(--line);
+  border-radius: 0.35cqw;
+  padding: 1.5cqh 1.3cqw;
+  display: grid;
+  gap: 0.7cqh;
+  align-content: start;
+}
+.panel h3 { font-size: 1.44cqw; font-weight: 600; letter-spacing: -0.012em; }
+.panel p { margin: 0; font-size: 1.14cqw; line-height: 1.5; color: var(--mist); font-weight: 300; }
+.panel ul.plain li { font-size: 1.06cqw; line-height: 1.46; padding-left: 1.6cqw; }
+.panel .tag {
+  font-family: var(--mono); font-size: 0.9cqw; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--tide);
+}
+.panel.accent-reed .tag { color: var(--reed); }
+.panel.accent-sand .tag { color: var(--sand); }
+.panel.accent-coral .tag { color: var(--coral); }
+
+/* Data table — the survey's own register conventions: LGA, district, counts. */
+table.reg { width: 100%; border-collapse: collapse; font-size: 1.14cqw; }
+table.reg th {
+  text-align: left; font-family: var(--mono); font-weight: 500;
+  font-size: 0.92cqw; letter-spacing: 0.11em; text-transform: uppercase;
+  color: var(--dim); padding: 0 0.7cqw 0.8cqh 0; border-bottom: 1px solid var(--line);
+}
+table.reg td {
+  padding: 0.72cqh 0.7cqw 0.72cqh 0; border-bottom: 1px solid var(--line-soft);
+  color: #c6d8e1; font-weight: 300;
+}
+table.reg td:first-child { color: var(--chalk); font-weight: 400; }
+table.reg .n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+table.reg tr.total td { border-bottom: 0; color: var(--chalk); font-weight: 500; padding-top: 1cqh; }
+table.reg tr.total .n { color: var(--tide); }
+
+/* Ordered lists that encode a real sequence (survey steps, delivery horizons) */
+ol.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.25cqh; counter-reset: s; }
+ol.steps li {
+  display: grid; grid-template-columns: 2.6cqw 1fr; gap: 1cqw; align-items: start;
+  counter-increment: s;
+}
+ol.steps li::before {
+  content: counter(s, decimal-leading-zero);
+  font-family: var(--mono); font-size: 1.05cqw; color: var(--tide);
+  padding-top: 0.25cqh; letter-spacing: 0.04em;
+}
+ol.steps b { display: block; font-family: var(--display); font-size: 1.35cqw; font-weight: 600; letter-spacing: -0.008em; }
+ol.steps span { font-size: 1.14cqw; color: var(--mist); font-weight: 300; line-height: 1.5; }
+
+ul.plain { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.95cqh; }
+ul.plain li {
+  position: relative; padding-left: 1.85cqw;
+  font-size: 1.2cqw; line-height: 1.5; color: #c6d8e1; font-weight: 300;
+}
+ul.plain li::before {
+  content: "—"; position: absolute; left: 0; top: 0;
+  color: var(--tide-deep); font-family: var(--mono);
+}
+ul.plain b { color: var(--chalk); font-weight: 500; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 0.55cqw; }
+.chip {
+  font-family: var(--mono); font-size: 0.95cqw; letter-spacing: 0.06em;
+  border: 1px solid var(--line); border-radius: 99px;
+  padding: 0.55cqh 0.85cqw; color: var(--mist);
+}
+.chip.on { border-color: var(--tide-deep); color: var(--tide); background: rgba(63, 185, 230, 0.07); }
+
+.callout {
+  border-left: 2px solid var(--sand);
+  padding: 0.2cqh 0 0.2cqh 1.1cqw;
+  font-size: 1.16cqw; line-height: 1.55; color: var(--mist); font-weight: 300;
+}
+.callout b { color: var(--sand); font-weight: 500; }
+
+/* --------------------------------------------------------------------------
+   Cover
+   -------------------------------------------------------------------------- */
+.cover { display: grid; grid-template-columns: 1.5fr 1fr; gap: 3cqw; height: 100%; }
+.cover .mark { height: 6cqh; width: auto; display: block; margin-bottom: 3.4cqh; }
+.cover-left { display: grid; align-content: center; gap: 0; }
+.cover h1 {
+  font-size: 5.6cqw; font-weight: 800; letter-spacing: -0.04em; line-height: 0.98;
+}
+.cover .motto {
+  font-family: var(--mono); font-size: 1.28cqw; letter-spacing: 0.24em;
+  text-transform: uppercase; color: var(--tide); margin: 2cqh 0 2.4cqh;
+}
+.cover .sub { font-size: 1.72cqw; line-height: 1.5; font-weight: 300; color: var(--mist); max-width: 40ch; }
+.cover .meta {
+  margin-top: 3.4cqh; padding-top: 1.8cqh; border-top: 1px solid var(--line);
+  display: flex; gap: 2.2cqw; font-family: var(--mono); font-size: 1.05cqw; color: var(--dim);
+  letter-spacing: 0.06em;
+}
+.cover .meta b { display: block; color: var(--chalk); font-weight: 500; font-size: 1.5cqw; letter-spacing: -0.01em; }
+.cover-right { display: grid; grid-template-rows: 1fr; }
+
+/* Section divider slides */
+.divider { display: grid; align-content: center; height: 100%; gap: 1.6cqh; }
+.divider .n { font-family: var(--mono); font-size: 1.2cqw; letter-spacing: 0.3em; color: var(--tide); }
+.divider h2 { font-size: 6cqw; font-weight: 800; letter-spacing: -0.04em; }
+.divider p { margin: 0; font-size: 1.7cqw; font-weight: 300; color: var(--mist); max-width: 52ch; line-height: 1.45; }
+
+/* Wide imagery (the two report cartographies, which are letterbox) */
+.map-plate { border: 1px solid var(--line); border-radius: 0.3cqw; overflow: hidden; background: #dceaf2; }
+.map-plate img { width: 100%; display: block; }
+
+/* --------------------------------------------------------------------------
+   HUD — presenter controls
+   -------------------------------------------------------------------------- */
+.hud {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 16px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; color: var(--dim);
+  background: linear-gradient(transparent, rgba(4, 18, 27, 0.86) 55%);
+  opacity: 0; transition: opacity 180ms ease;
+  pointer-events: none;
+}
+.hud.show { opacity: 1; pointer-events: auto; }
+.hud button {
+  font: inherit; letter-spacing: inherit; color: var(--mist);
+  background: rgba(10, 30, 43, 0.9); border: 1px solid var(--line);
+  border-radius: 5px; padding: 5px 10px; cursor: pointer;
+}
+.hud button:hover { color: var(--chalk); border-color: var(--tide-deep); }
+.hud button:focus-visible, .jump li button:focus-visible { outline: 2px solid var(--tide); outline-offset: 2px; }
+.hud .count { margin-left: auto; color: var(--mist); font-variant-numeric: tabular-nums; }
+
+.progress { position: fixed; left: 0; bottom: 0; height: 2px; background: var(--tide); z-index: 21; transition: width 220ms ease; }
+
+/* Contents overlay */
+.jump {
+  position: fixed; inset: 0; z-index: 30; background: rgba(4, 18, 27, 0.97);
+  padding: 4vh 5vw; overflow: auto; display: none;
+}
+.jump.show { display: block; }
+.jump h3 { font-family: var(--display); font-size: 20px; margin: 0 0 18px; letter-spacing: -0.01em; }
+.jump ol { list-style: none; margin: 0; padding: 0; columns: 3; column-gap: 32px; }
+.jump li { break-inside: avoid; margin-bottom: 4px; }
+.jump li button {
+  display: flex; gap: 10px; width: 100%; text-align: left; background: none; border: 0;
+  color: var(--mist); font-family: var(--mono); font-size: 12px; padding: 5px 6px;
+  border-radius: 4px; cursor: pointer; line-height: 1.4;
+}
+.jump li button:hover { background: var(--shelf); color: var(--chalk); }
+.jump li button .i { color: var(--tide); font-variant-numeric: tabular-nums; }
+.jump li[data-part]::marker { content: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+@media print {
+  body { overflow: visible; }
+  .stage { position: static; display: block; }
+  .slide { display: block !important; width: 100%; height: auto; aspect-ratio: 16 / 9; page-break-after: always; }
+  .hud, .progress, .jump { display: none !important; }
+}
+</style>
+
+<div class="stage">
+  <div class="deck" id="deck">
+
+    <!-- 1 ================================================================= -->
+    <section class="slide" data-title="Cover">
+      <div class="frame" style="grid-template-rows: 1fr;">
+        <div class="cover">
+          <div class="cover-left">
+            <img class="mark" src="{{img:logo}}" alt="Blue Lagos">
+            <h1>The 134 communities Lagos has not counted</h1>
+            <div class="motto">No community is left behind</div>
+            <p class="sub">A door-to-door baseline of every riverine and coastal settlement across the three senatorial districts — and the live platform built on top of it.</p>
+            <div class="meta">
+              <div>Communities<b>134</b></div>
+              <div>Local govts<b>7</b></div>
+              <div>Districts<b>3</b></div>
+              <div>Residents<b>502,002</b></div>
+            </div>
+          </div>
+          <div class="cover-right">
+            <figure class="plate">
+              <img src="{{img:hero}}" alt="A riverine settlement seen from the water in Lagos State">
+              <figcaption>Blue Lagos field survey · a riverine settlement reached by water</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 ================================================================= -->
+    <section class="slide" data-title="Part 01 — Introduction" data-divider="1">
+      <div class="frame" style="grid-template-rows: auto 1fr auto;">
+        <div class="rail"><span class="part">Part 01</span><span class="sep">/</span><span>Introduction</span></div>
+        <div class="divider">
+          <div class="n">01</div>
+          <h2>Who we are, and why this exists</h2>
+          <p>Blue Lagos Sustainability Initiative is a grassroots non-profit working inside Lagos' riverine and coastal communities. This briefing is the evidence layer behind that work.</p>
+        </div>
+        <div class="foot"><b>Blue Lagos Initiatives</b><span>bluelagos.org</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 3 ================================================================= -->
+    <section class="slide" data-title="About Blue Lagos">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 01</span><span class="sep">/</span><span>Introduction</span><span class="src">Blue Lagos Community Baseline Report, August 2026</span></div>
+        <div class="body cols-photo">
+          <div class="stack">
+            <h2>A grassroots organisation that can physically reach these places</h2>
+            <p class="read">Blue Lagos Sustainability Initiative works directly inside the riverine and coastal communities documented in this report — building the relationships, the field survey infrastructure and the named local contacts that make a register like this possible at all.</p>
+            <p class="read">The mandate is simple: <strong>no community is left behind, regardless of how difficult it is to physically reach.</strong> Many of these settlements are accessible only by boat, and roughly nine in ten have never had a government or NGO programme of any kind.</p>
+            <div class="chips" style="margin-top:0.6cqh;">
+              <span class="chip on">Data intelligence</span>
+              <span class="chip on">Community engagement</span>
+              <span class="chip on">Advocacy</span>
+              <span class="chip on">Multi-sector partnerships</span>
+            </div>
+          </div>
+          <div class="plate-strip">
+            <figure class="plate">
+              <img src="{{img:team_water}}" alt="Blue Lagos field team in life jackets at a shoreline">
+              <figcaption>Field team, shoreline access</figcaption>
+            </figure>
+            <figure class="plate">
+              <img src="{{img:engage}}" alt="A community engagement meeting under a canopy">
+              <figcaption>Community engagement session</figcaption>
+            </figure>
+          </div>
+        </div>
+        <div class="foot"><b>Blue Lagos Initiatives</b><span>Grassroots · non-profit · Lagos State</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 4 ================================================================= -->
+    <section class="slide" data-title="The gap this closes">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 01</span><span class="sep">/</span><span>Introduction</span><span class="src">Baseline report, Part 1</span></div>
+        <div class="body cols-2">
+          <div class="stack">
+            <h2>These communities are not under-served by accident. They are under-recorded.</h2>
+            <p class="read">Riverine and coastal settlements sit outside the datasets Lagos State plans with. Without a register, they cannot be budgeted for, sequenced, or monitored — so they are skipped, and the skipping is invisible.</p>
+            <p class="read">Between 2025 and 2026 we ran a door-to-door baseline of <strong>134 communities</strong> across 7 Local Government Areas, so that every subsequent conversation with a government partner starts from the same verified, community-level evidence rather than estimates.</p>
+          </div>
+          <div class="figs cols-2" style="align-content:center;">
+            <div class="fig coral">
+              <div class="v">91%</div>
+              <div class="k">Never reached</div>
+              <div class="n">122 of 134 communities have never received an NGO or government programme of any kind. In Lagos East, 94.7%.</div>
+            </div>
+            <div class="fig sand">
+              <div class="v">83.6%</div>
+              <div class="k">No first aid</div>
+              <div class="n">No formal first-aid access point — traditional care, or nothing at all.</div>
+            </div>
+            <div class="fig sand">
+              <div class="v">93.1%</div>
+              <div class="k">No school past primary</div>
+              <div class="n">No education facility beyond primary level physically present in the community.</div>
+            </div>
+            <div class="fig coral">
+              <div class="v">81.3%</div>
+              <div class="k">Open defecation</div>
+              <div class="n">Open or open-water defecation is the primary household toilet method.</div>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><b>Source</b><span>Blue Lagos field survey, 134 communities</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 5 ================================================================= -->
+    <section class="slide" data-title="What you are seeing today">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 01</span><span class="sep">/</span><span>Introduction</span></div>
+        <div class="body">
+          <h2>Two things, built from one register</h2>
+          <div class="cols-2" style="display:grid; gap:2.4cqw;">
+            <div class="panel">
+              <div class="tag">Document</div>
+              <h3>The Community Baseline Report</h3>
+              <p>Eight parts and an appendix: methodology, fourteen thematic analyses compared across districts and LGAs, a civic-registration deep dive, four data-derived need clusters, cross-factor analysis, a district-by-district ranking of every community by severity, and a phased action plan.</p>
+              <p style="color:var(--dim);">August 2026 · Blue Lagos Initiatives</p>
+            </div>
+            <div class="panel accent-reed">
+              <div class="tag">Platform</div>
+              <h3>The live Blue Lagos dashboard</h3>
+              <p>The same 134-community register, queried live: an interactive map over satellite imagery, per-community dossiers, thematic pages, a priority model, a scenario lab for siting an intervention, and a data-quality page that shows exactly what is missing.</p>
+              <p style="color:var(--dim);">Everything calculated by the platform is labelled as calculated.</p>
+            </div>
+          </div>
+          <div class="callout" style="margin-top:1.2cqh;"><b>One rule runs through both.</b> Nothing is modelled where it can be measured, and nothing is filled in where it is missing. A community that gave no population estimate is reported as unknown — never counted as zero, never imputed.</div>
+        </div>
+        <div class="foot"><b>Today</b><span>Slides first, then the live platform</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 6 ================================================================= -->
+    <section class="slide" data-title="Part 02 — The data" data-divider="1">
+      <div class="frame" style="grid-template-rows: auto 1fr auto;">
+        <div class="rail"><span class="part">Part 02</span><span class="sep">/</span><span>The data</span></div>
+        <div class="divider">
+          <div class="n">02</div>
+          <h2>What 134 door-to-door visits produced</h2>
+          <p>Coverage, method, and the shape of the population behind every figure in this deck.</p>
+        </div>
+        <div class="foot"><b>Blue Lagos Initiatives</b><span>Field survey, 2025–2026</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 7 ================================================================= -->
+    <section class="slide" data-title="Coverage at a glance">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 02</span><span class="sep">/</span><span>The data</span><span class="src">Baseline report §1.3</span></div>
+        <div class="body">
+          <h2>Coverage at a glance</h2>
+          <div class="figs cols-4">
+            <div class="fig tide"><div class="v">134</div><div class="k">Communities surveyed</div><div class="n">93 currently placed on the live map with field-captured coordinates</div></div>
+            <div class="fig"><div class="v">502,002</div><div class="k">Residents represented</div><div class="n">Community-reported estimates, summed only where an estimate was given</div></div>
+            <div class="fig"><div class="v">62,494</div><div class="k">Estimated households</div><div class="n">Report estimate; the live platform publishes a verifiable floor of 22,398 from the bands 93 communities reported</div></div>
+            <div class="fig"><div class="v">241,053</div><div class="k">Registered voters</div><div class="n">Reported by 128 communities; 6 gave no figure</div></div>
+          </div>
+          <div class="figs cols-4" style="margin-top:1.4cqh;">
+            <div class="fig sm reed"><div class="v">7</div><div class="k">Local Government Areas</div></div>
+            <div class="fig sm reed"><div class="v">3</div><div class="k">Senatorial districts</div></div>
+            <div class="fig sm reed"><div class="v">13</div><div class="k">Deprivation indicators per community</div></div>
+            <div class="fig sm reed"><div class="v">2025–26</div><div class="k">Field window</div></div>
+          </div>
+        </div>
+        <div class="foot"><b>Note</b><span>The register is live. Figures move as field verification continues, which is why a few differ slightly from the printed August report.</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 8 ================================================================= -->
+    <section class="slide" data-title="How the evidence was built">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 02</span><span class="sep">/</span><span>The data</span><span class="src">Baseline report, Part 2</span></div>
+        <div class="body cols-photo-l">
+          <figure class="plate">
+            <img src="{{img:survey}}" alt="A Blue Lagos enumerator recording survey responses on a laptop in the field">
+            <figcaption>Enumeration in the field, fixed-category questionnaire</figcaption>
+          </figure>
+          <div class="stack">
+            <h2>How the evidence was built</h2>
+            <ol class="steps">
+              <li><b>Built outward from real relationships</b><span>Coverage started in Epe and Ibeju-Lekki, where Blue Lagos already worked, then extended systematically across Ojo, Amuwo Odofin, Badagry, Eti Osa and Apapa.</span></li>
+              <li><b>A working definition of a community</b><span>A named cluster with its own recognised head or ruler, an identifiable population, and a physical location separate from neighbouring clusters.</span></li>
+              <li><b>Interviewed through the head, not around him</b><span>Enumerators engaged each community's recognised ruler directly, supplemented by resident interviews.</span></li>
+              <li><b>Fixed categories, not free text</b><span>Responses were recorded against set options wherever possible, so findings aggregate consistently regardless of who ran the interview.</span></li>
+              <li><b>A named contact left behind</b><span>Every record carries a designated Blue Lagos community contact — a channel back, not a one-time data point.</span></li>
+            </ol>
+          </div>
+        </div>
+        <div class="foot"><b>Analysis</b><span>Unsupervised clustering across 13 indicators · pairwise lift testing · a per-community severity score out of 13</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 9 ================================================================= -->
+    <section class="slide" data-title="Coverage by LGA">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 02</span><span class="sep">/</span><span>The data</span><span class="src">Baseline report §2.5</span></div>
+        <div class="body cols-2">
+          <div class="stack">
+            <h2>Where the 134 communities are</h2>
+            <table class="reg">
+              <thead><tr><th>Local Government Area</th><th>District</th><th class="n">Communities</th><th class="n">Population</th></tr></thead>
+              <tbody>
+                <tr><td>Epe</td><td>Lagos East</td><td class="n">66</td><td class="n">175,273</td></tr>
+                <tr><td>Ojo</td><td>Lagos West</td><td class="n">29</td><td class="n">132,881</td></tr>
+                <tr><td>Amuwo Odofin</td><td>Lagos West</td><td class="n">17</td><td class="n">106,113</td></tr>
+                <tr><td>Badagry</td><td>Lagos West</td><td class="n">10</td><td class="n">51,993</td></tr>
+                <tr><td>Ibeju Lekki</td><td>Lagos East</td><td class="n">9</td><td class="n">11,745</td></tr>
+                <tr><td>Apapa</td><td>Lagos Central</td><td class="n">2</td><td class="n">16,997</td></tr>
+                <tr><td>Eti Osa</td><td>Lagos Central</td><td class="n">1</td><td class="n">7,000</td></tr>
+                <tr class="total"><td>Total</td><td>3 districts</td><td class="n">134</td><td class="n">502,002</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="stack">
+            <p class="read"><strong>Lagos East carries the most communities; Lagos West carries the most people.</strong> That is the signature of small, dispersed riverine settlements in the east against fewer, larger settlements in the west — and it means a per-community budget and a per-resident budget point at different places.</p>
+            <div class="figs cols-3">
+              <div class="fig sm tide"><div class="v">75</div><div class="k">Lagos East</div><div class="n">187,018 residents</div></div>
+              <div class="fig sm tide"><div class="v">56</div><div class="k">Lagos West</div><div class="n">290,987 residents</div></div>
+              <div class="fig sm tide"><div class="v">3</div><div class="k">Lagos Central</div><div class="n">23,997 residents</div></div>
+            </div>
+            <p class="small">Lagos Central's three surveyed communities are the most urbanised in the register and score better on almost every access indicator — they are used throughout the report as the practical benchmark for what adequate coverage looks like inside the same state.</p>
+          </div>
+        </div>
+        <div class="foot"><b>Source</b><span>Blue Lagos field survey · community-reported population estimates</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 10 ================================================================ -->
+    <section class="slide" data-title="Who lives there">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 02</span><span class="sep">/</span><span>The data</span><span class="src">Live platform · Blue Lagos register</span></div>
+        <div class="body cols-photo">
+          <div class="stack">
+            <h2>Who lives there</h2>
+            <div class="figs cols-2">
+              <div class="fig"><div class="v">212,880</div><div class="k">Women</div><div class="n">Recorded by 133 of 134 communities</div></div>
+              <div class="fig"><div class="v">196,374</div><div class="k">Youth, 18–35</div><div class="n">Close to two-fifths of the surveyed population</div></div>
+              <div class="fig sand"><div class="v">1,289</div><div class="k">Pregnant women</div><div class="n">Requiring maternal care in settlements with no motorised evacuation</div></div>
+              <div class="fig tide"><div class="v">64.9%</div><div class="k">Fish for a living</div><div class="n">Followed by farming (17.2%) and trading (12.7%)</div></div>
+            </div>
+            <div class="callout"><b>The youth figure is not a future problem.</b> A large share of that 196,374 already passed through the education gap on the next slides — no secondary school inside the community, and for some, open water between them and the nearest one.</div>
+          </div>
+          <figure class="plate">
+            <img src="{{img:gathering}}" alt="A large community gathering outside a building in a Lagos riverine settlement">
+            <figcaption>Community gathering at a survey visit</figcaption>
+          </figure>
+        </div>
+        <div class="foot"><b>Method</b><span>Community-reported estimates, summed null-preserving. No modelled population surface is mixed in.</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 11 ================================================================ -->
+    <section class="slide" data-title="The spatial picture">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 02</span><span class="sep">/</span><span>The data</span><span class="src">Baseline report §3.9, §5.4</span></div>
+        <div class="body">
+          <h2>Severity sits on the low ground</h2>
+          <div style="display:grid; gap:1.4cqh;">
+            <figure class="map-plate"><img src="{{img:severity}}" alt="Map of Lagos State showing surveyed community severity scores overlaid on elevation and LGA boundaries"></figure>
+            <figure class="map-plate"><img src="{{img:shoreline}}" alt="Map of net shoreline change along the Lagos coastline between 1984 and 2021"></figure>
+          </div>
+          <p class="small" style="margin-top:0.6cqh;">Above: community severity overlaid on elevation and LGA boundaries. Below: net shoreline change along the barrier coastline, 1984–2021. <span style="color:var(--sand);">22.4% of communities have lost living space or houses to riverbank erosion or water encroachment in the last five years.</span></p>
+        </div>
+        <div class="foot"><b>Figures</b><span>Reproduced from the Blue Lagos Community Baseline Report, Part 3.9 and Part 5.4</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 12 ================================================================ -->
+    <section class="slide" data-title="Part 03 — Domains" data-divider="1">
+      <div class="frame" style="grid-template-rows: auto 1fr auto;">
+        <div class="rail"><span class="part">Part 03</span><span class="sep">/</span><span>Domains</span></div>
+        <div class="divider">
+          <div class="n">03</div>
+          <h2>Seven domains, one pattern</h2>
+          <p>Health, water, infrastructure, education, livelihoods, civic access, disaster resilience — compared across the three senatorial districts, then broken to LGA level.</p>
+        </div>
+        <div class="foot"><b>Reading these</b><span>Every percentage is a share of the 134 surveyed communities unless stated</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 13 ================================================================ -->
+    <section class="slide" data-title="Health and emergency response">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 03</span><span class="sep">/</span><span>Health &amp; emergency</span><span class="src">Baseline report §3.3</span></div>
+        <div class="body cols-photo">
+          <div class="stack">
+            <h2>An emergency here is a paddling problem</h2>
+            <div class="bars">
+              <div class="bar"><span class="lab">No formal first-aid point</span><span class="track"><span class="fill coral" style="width:83.6%"></span></span><span class="val">83.6%</span></div>
+              <div class="bar"><span class="lab">Unmotorised boat, or no means, for medical evacuation</span><span class="track"><span class="fill coral" style="width:80.6%"></span></span><span class="val">80.6%</span></div>
+              <div class="bar"><span class="lab">No immunisation visit in 12 months</span><span class="track"><span class="fill sand" style="width:19.4%"></span></span><span class="val">19.4%</span></div>
+              <div class="bar"><span class="lab">Believe not all children are reached by routine immunisation</span><span class="track"><span class="fill sand" style="width:40.3%"></span></span><span class="val">40.3%</span></div>
+              <div class="bar-scale"><span>0%</span><span>50%</span><span>100% of communities</span></div>
+            </div>
+            <p class="read">In Lagos East, the first-aid figure reaches <strong>97.3%</strong> — formal health infrastructure is almost entirely absent from the communities surveyed there. The evacuation gap, by contrast, is flat across all three districts, which is exactly why it should be funded as a state-wide riverine ambulance programme rather than allocated district by district.</p>
+          </div>
+          <figure class="plate">
+            <img src="{{img:boat}}" alt="Residents boarding a wooden boat at a riverine community landing">
+            <figcaption>The landing point — where medical evacuation, market access and daily transport all converge</figcaption>
+          </figure>
+        </div>
+        <div class="foot"><b>Compounding</b><span>64.9% of boat landings are an unimproved mudbank</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 14 ================================================================ -->
+    <section class="slide" data-title="Water, sanitation and waste">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 03</span><span class="sep">/</span><span>Water &amp; sanitation</span><span class="src">Baseline report §3.4, §3.12</span></div>
+        <div class="body cols-2">
+          <div class="stack">
+            <h2>One exposure pathway, not two problems</h2>
+            <p class="read">Open or open-water defecation is the primary household toilet method in <strong>81.3%</strong> of communities, rising to 94.7% in Lagos East. In the same settlements, a well is the everyday drinking water source for 61.9%, and river water — the least protected source there is — still serves 6.7% directly.</p>
+            <p class="read">Read together with multi-day flood stagnation in the rainy season, water and sanitation here are not two line items. They are <strong>one shared exposure pathway</strong>, and should be budgeted as a single WASH programme.</p>
+          </div>
+          <div class="stack">
+            <div class="bars">
+              <div class="bar"><span class="lab">Open or open-water defecation</span><span class="track"><span class="fill coral" style="width:81.3%"></span></span><span class="val">81.3%</span></div>
+              <div class="bar"><span class="lab">Well as primary drinking water</span><span class="track"><span class="fill" style="width:61.9%"></span></span><span class="val">61.9%</span></div>
+              <div class="bar"><span class="lab">Borehole as primary drinking water</span><span class="track"><span class="fill reed" style="width:28.4%"></span></span><span class="val">28.4%</span></div>
+              <div class="bar"><span class="lab">River water as primary drinking water</span><span class="track"><span class="fill coral" style="width:6.7%"></span></span><span class="val">6.7%</span></div>
+              <div class="bar-scale"><span>0%</span><span>50%</span><span>100% of communities</span></div>
+            </div>
+            <div class="callout"><b>Lagos East, sanitation:</b> 94.7% of its surveyed communities. This is the single widest gap recorded anywhere in the register.</div>
+          </div>
+        </div>
+        <div class="foot"><b>Source</b><span>Blue Lagos field survey · fixed-category responses</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 15 ================================================================ -->
+    <section class="slide" data-title="Infrastructure and connectivity">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 03</span><span class="sep">/</span><span>Infrastructure</span><span class="src">Baseline report §3.5, §3.10</span></div>
+        <div class="body cols-2">
+          <div class="stack">
+            <h2>A single-district fix with state-wide consequences</h2>
+            <div class="bars">
+              <div class="bar"><span class="lab">Voice-only network, no data or 4G</span><span class="track"><span class="fill sand" style="width:43.3%"></span></span><span class="val">43.3%</span></div>
+              <div class="bar"><span class="lab">— of which, in Lagos East</span><span class="track"><span class="fill coral" style="width:74.7%"></span></span><span class="val">74.7%</span></div>
+              <div class="bar"><span class="lab">No electricity at all for night lighting</span><span class="track"><span class="fill sand" style="width:31.3%"></span></span><span class="val">31.3%</span></div>
+              <div class="bar"><span class="lab">Boat landing is an unimproved mudbank</span><span class="track"><span class="fill coral" style="width:64.9%"></span></span><span class="val">64.9%</span></div>
+              <div class="bar"><span class="lab">Wood as dominant wall material</span><span class="track"><span class="fill" style="width:56.7%"></span></span><span class="val">56.7%</span></div>
+              <div class="bar-scale"><span>0%</span><span>50%</span><span>100% of communities</span></div>
+            </div>
+          </div>
+          <div class="stack">
+            <p class="read">Voice-only coverage is <strong>almost entirely a Lagos East problem</strong> — 74.7% of its communities against near-zero in Lagos West and Central. It blocks mobile banking, e-governance, and remote PVC and NIN self-service, which means several other gaps in this deck trace back to it.</p>
+            <p class="read">Electricity runs the other way: the deepest gap is in <strong>Lagos West at 42.9%</strong>, where it compounds most strongly with health access.</p>
+            <div class="callout"><b>Wood plus water.</b> 56.7% wood-walled housing sits on top of the erosion and flood exposure in the register. Structural resilience and disaster planning should be read as one budget line, not two.</div>
+          </div>
+        </div>
+        <div class="foot"><b>Highest leverage</b><span>4G extension to the Lagos East corridor — identified in the report as the single highest-leverage infrastructure investment</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 16 ================================================================ -->
+    <section class="slide" data-title="Education access">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 03</span><span class="sep">/</span><span>Education</span><span class="src">Baseline report §3.6</span></div>
+        <div class="body cols-photo">
+          <div class="stack">
+            <h2>Secondary school is outside the community, and often across water</h2>
+            <div class="figs cols-2">
+              <div class="fig coral"><div class="v">93.1%</div><div class="k">No school past primary</div><div class="n">No education facility beyond primary level physically present inside the community cluster</div></div>
+              <div class="fig sand"><div class="v">17.2%</div><div class="k">Children cross open water</div><div class="n">Forced to cross open water or a major transit route with no pedestrian bridge to reach the nearest school</div></div>
+            </div>
+            <p class="read">The 17.2% is a safety hazard layered directly on top of an access gap. It is also the clearest example in this register of a problem that a small, specific, cheap intervention — a footbridge, a school boat, a transport stipend — can close outright.</p>
+          </div>
+          <figure class="plate">
+            <img src="{{img:school}}" alt="Schoolchildren gathered in front of a local government signboard in a riverine community">
+            <figcaption>School-age children, riverine community</figcaption>
+          </figure>
+        </div>
+        <div class="foot"><b>Who this affects</b><span>196,374 young adults aged 18–35 already passed through this gap</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 17 ================================================================ -->
+    <section class="slide" data-title="Livelihoods and food security">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 03</span><span class="sep">/</span><span>Livelihoods</span><span class="src">Baseline report §3.7, §3.11</span></div>
+        <div class="body cols-2">
+          <div class="stack">
+            <h2>Constrained by infrastructure, not by the livelihood</h2>
+            <p class="read">Fishing is the dominant occupation at <strong>64.9%</strong>, then farming at 17.2% and trading at 12.7%. A community that lives on fish and harvest but cannot physically get either to market at a fair price is not economically weak — it is <strong>infrastructurally blocked</strong>.</p>
+            <div class="bars">
+              <div class="bar"><span class="lab">Rely on stored reserves in lean season</span><span class="track"><span class="fill sand" style="width:75.4%"></span></span><span class="val">75.4%</span></div>
+              <div class="bar"><span class="lab">Skip meals outright in lean season</span><span class="track"><span class="fill coral" style="width:17.2%"></span></span><span class="val">17.2%</span></div>
+              <div class="bar"><span class="lab">No active cooperative or thrift society</span><span class="track"><span class="fill sand" style="width:50%"></span></span><span class="val">50%</span></div>
+              <div class="bar"><span class="lab">— of which, in Lagos West</span><span class="track"><span class="fill coral" style="width:83.9%"></span></span><span class="val">83.9%</span></div>
+              <div class="bar-scale"><span>0%</span><span>50%</span><span>100% of communities</span></div>
+            </div>
+          </div>
+          <div class="stack">
+            <div class="callout"><b>17.2% skipping meals</b> is a direct, measurable food-insecurity indicator and belongs in a welfare line of its own — separate from the longer-run market-access work.</div>
+            <p class="read">Half of these communities have no active <strong>Esusu or Ajo</strong> — the cooperative and thrift structures they already understand. Where the tradition exists, supporting it is the cheapest available channel for micro-lending and economic resilience; it needs formalising, not inventing.</p>
+            <figure class="plate" style="aspect-ratio:16/9;">
+              <img src="{{img:shore}}" alt="A large gathering of residents along a shoreline in a riverine community">
+              <figcaption>Shoreline community, Blue Lagos field visit</figcaption>
+            </figure>
+          </div>
+        </div>
+        <div class="foot"><b>Source</b><span>Blue Lagos field survey · primary occupation and lean-season coping strategy</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 18 ================================================================ -->
+    <section class="slide" data-title="Civic access">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 03</span><span class="sep">/</span><span>Civic access</span><span class="src">Baseline report §3.2, Part 4</span></div>
+        <div class="body cols-2">
+          <div class="stack">
+            <h2>A logistics barrier, not an attitude problem</h2>
+            <div class="figs cols-2">
+              <div class="fig tide"><div class="v">48%</div><div class="k">Voter registration rate</div><div class="n">Registered voters as a share of estimated population — 61.5% in Lagos East, 40.1% in Lagos West</div></div>
+              <div class="fig coral"><div class="v">86.6%</div><div class="k">PVC blocked by cost or distance</div><div class="n">Cite travel cost, the absence of a nearby registration centre, or both — 92.9% in Lagos West</div></div>
+            </div>
+            <p class="read">Because the barrier is logistical rather than attitudinal, a <strong>mobile registration unit on a fixed schedule</strong> removes it at source. No persuasion campaign is required — these residents are already asking to be counted.</p>
+          </div>
+          <div class="stack">
+            <div class="panel">
+              <div class="tag">Why this indicator matters most</div>
+              <h3>It is the one measure that maps onto a system the state already runs</h3>
+              <p>Every other gap in this deck needs new delivery machinery. Registration needs an existing agency to visit a place it has not visited. That makes it the fastest visible proof that a partnership is real.</p>
+            </div>
+            <div class="callout"><b>241,053 registered voters</b> already live in these 134 communities — residents contributing to the Lagos economy through fishing, farming and trading, and asking through this survey to be counted.</div>
+          </div>
+        </div>
+        <div class="foot"><b>Also recorded</b><span>NIN coverage bands and the stated barriers to obtaining one, per community</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 19 ================================================================ -->
+    <section class="slide" data-title="Governance and disaster resilience">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 03</span><span class="sep">/</span><span>Governance &amp; resilience</span><span class="src">Baseline report §3.8, §3.9, §3.14</span></div>
+        <div class="body cols-2">
+          <div class="stack">
+            <h2>No plan, no committee, no prior contact</h2>
+            <div class="bars">
+              <div class="bar"><span class="lab">Never reached by any NGO or government programme</span><span class="track"><span class="fill coral" style="width:91%"></span></span><span class="val">91%</span></div>
+              <div class="bar"><span class="lab">No evacuation point or disaster committee</span><span class="track"><span class="fill coral" style="width:63.4%"></span></span><span class="val">63.4%</span></div>
+              <div class="bar"><span class="lab">Lost living space to erosion in 5 years</span><span class="track"><span class="fill sand" style="width:22.4%"></span></span><span class="val">22.4%</span></div>
+              <div class="bar"><span class="lab">Past government project described as abandoned</span><span class="track"><span class="fill sand" style="width:14.9%"></span></span><span class="val">14.9%</span></div>
+              <div class="bar-scale"><span>0%</span><span>50%</span><span>100% of communities</span></div>
+            </div>
+          </div>
+          <div class="stack">
+            <p class="read">Disaster preparedness inverts the usual pattern: it is near-universal absence in <strong>Lagos West (98.2%) and Lagos Central (100%)</strong>, the districts that score better on nearly everything else.</p>
+            <div class="callout"><b>14.9% describe a past project as abandoned.</b> That is a trust problem any new intervention has to visibly avoid repeating — which is what the named ongoing community contact in every record is for.</div>
+            <p class="read">Where a security incident or land dispute arises, <strong>86.6%</strong> go first to a traditional authority; police are the primary channel in 12.7%. That is not a gap to close — it is an existing governance structure, and the entry point every programme should be introduced through.</p>
+          </div>
+        </div>
+        <div class="foot"><b>Reaching people</b><span>Community leaders plus social media are the top information channel in 54.5% of communities</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 20 ================================================================ -->
+    <section class="slide" data-title="Deprivation compounds">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 03</span><span class="sep">/</span><span>Cross-factor analysis</span><span class="src">Baseline report Parts 5 &amp; 6</span></div>
+        <div class="body">
+          <h2>The headline finding is not any single gap — it is that they arrive together</h2>
+          <p class="read" style="max-width:96ch;">Grouping all 134 communities by their combined need profile rather than by geography separates them into four clusters. This distinction is a budgeting instruction: the intervention that closes a large peri-urban community's gaps is not the intervention the highest-severity cluster needs.</p>
+          <table class="reg" style="margin-top:0.6cqh;">
+            <thead><tr><th>Cluster</th><th>Lead constraint</th><th class="n">Communities</th><th class="n">Avg. population</th><th class="n">Avg. severity /13</th><th>Priority action</th></tr></thead>
+            <tbody>
+              <tr><td>1 · Digitally Cut-Off Corridor</td><td>Network connectivity</td><td class="n">49</td><td class="n">3,480</td><td class="n">6.6</td><td>4G network extension</td></tr>
+              <tr><td>2 · Institutionally Under-Governed Belt</td><td>Civic and institutional infrastructure</td><td class="n">19</td><td class="n">4,472</td><td class="n">7.2</td><td>Evacuation planning, civic outreach</td></tr>
+              <tr><td>3 · Larger, Under-Serviced Peri-Urban</td><td>Schooling and evacuation at scale</td><td class="n">26</td><td class="n">5,198</td><td class="n">7.2</td><td>School access, evacuation planning</td></tr>
+              <tr><td>4 · Broadest Multi-Deprivation</td><td>Cross-district compounding neglect</td><td class="n">40</td><td class="n">2,783</td><td class="n">8.8</td><td>Mobile health outreach</td></tr>
+            </tbody>
+          </table>
+          <div class="callout" style="margin-top:1cqh;"><b>Compounding, not scattered.</b> A community missing one form of basic infrastructure is measurably more likely to be missing several others. Cluster 4 carries the highest average severity of the four and spans both Lagos East and Lagos West.</div>
+        </div>
+        <div class="foot"><b>Method</b><span>Unsupervised classification across 13 deprivation indicators simultaneously · pairwise lift testing</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 21 ================================================================ -->
+    <section class="slide" data-title="Part 04 — Our interventions" data-divider="1">
+      <div class="frame" style="grid-template-rows: auto 1fr auto;">
+        <div class="rail"><span class="part">Part 04</span><span class="sep">/</span><span>Our interventions</span></div>
+        <div class="divider">
+          <div class="n">04</div>
+          <h2>What Blue Lagos already runs</h2>
+          <p>The register is not a proposal document produced from outside. It came out of work that is already happening in these communities.</p>
+        </div>
+        <div class="foot"><b>Blue Lagos Initiatives</b><span>Delivery, engagement and partnership</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 22 ================================================================ -->
+    <section class="slide" data-title="Current work">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 04</span><span class="sep">/</span><span>Our interventions</span></div>
+        <div class="body">
+          <h2>Four things running now</h2>
+          <div class="cols-4" style="display:grid; gap:1.2cqw;">
+            <div class="panel accent-reed">
+              <div class="tag">Health · with LASHMA</div>
+              <h3>Telemedicine to 152 coastal communities</h3>
+              <p>A partnership with the Lagos State Health Management Agency to deploy telemedicine — remote consultation, referral, follow-up care and preventive guidance — into riverine and coastal settlements where distance and transport are the barrier.</p>
+              <p style="color:var(--dim);">Announced June 2026</p>
+            </div>
+            <div class="panel">
+              <div class="tag">Register</div>
+              <h3>134 communities with named contacts</h3>
+              <p>Every record carries a designated Blue Lagos contact person inside the community, with phone numbers, plus the recognised head or ruler. That is a permanent channel for any programme that follows, not a one-time survey.</p>
+            </div>
+            <div class="panel">
+              <div class="tag">Platform</div>
+              <h3>A live decision platform</h3>
+              <p>The register queried live: map, dossiers, thematic pages, a priority model, a scenario lab for siting a facility, and a data-quality page that publishes what is missing rather than hiding it.</p>
+            </div>
+            <div class="panel accent-sand">
+              <div class="tag">Engagement</div>
+              <h3>Continuous community engagement</h3>
+              <p>Ongoing engagement sessions in the communities in the register — including Epe and Ojo LGAs — with an engagement record maintained per community alongside the baseline.</p>
+            </div>
+          </div>
+          <div class="plate-strip" style="margin-top:1.4cqh; height:16cqh;">
+            <figure class="plate"><img src="{{img:banner}}" alt="Blue Lagos team holding a branded banner in a community"><figcaption>Community engagement</figcaption></figure>
+            <figure class="plate"><img src="{{img:engage}}" alt="Residents seated at a Blue Lagos engagement session"><figcaption>Engagement session</figcaption></figure>
+            <figure class="plate"><img src="{{img:team_water}}" alt="Blue Lagos field team at a shoreline in life jackets"><figcaption>Field team on the water</figcaption></figure>
+            <figure class="plate"><img src="{{img:survey}}" alt="Survey enumeration in progress in a community"><figcaption>Enumeration</figcaption></figure>
+            <figure class="plate"><img src="{{img:shore}}" alt="A shoreline gathering of community residents"><figcaption>Shoreline community</figcaption></figure>
+            <figure class="plate"><img src="{{img:boat}}" alt="Residents boarding a boat at a community landing"><figcaption>Access by water</figcaption></figure>
+          </div>
+        </div>
+        <div class="foot"><b>Coverage</b><span>Vanguard · The Guardian Nigeria · TheGuild — June 2026, on the LASHMA telemedicine partnership</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 23 ================================================================ -->
+    <section class="slide" data-title="Partnerships">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 04</span><span class="sep">/</span><span>Partnerships</span></div>
+        <div class="body cols-photo-l">
+          <div class="plate-strip" style="grid-auto-flow:row; grid-auto-columns:auto; grid-template-columns:1fr 1fr;">
+            <figure class="plate"><img src="{{img:partner_a}}" alt="Blue Lagos team meeting with a Lagos State agency"><figcaption>Agency engagement</figcaption></figure>
+            <figure class="plate"><img src="{{img:partner_b}}" alt="Blue Lagos team at a session on institutionalising the blue economy"><figcaption>Blue economy engagement</figcaption></figure>
+            <figure class="plate"><img src="{{img:partner_c}}" alt="Blue Lagos team with partner representatives"><figcaption>Partner meeting</figcaption></figure>
+            <figure class="plate"><img src="{{img:partner_d}}" alt="Blue Lagos team with private sector partners"><figcaption>Private sector partner</figcaption></figure>
+          </div>
+          <div class="stack">
+            <h2>The work already runs through partnership</h2>
+            <p class="read">Blue Lagos works with Lagos State government agencies and private entities. The engagements behind this baseline include the Lagos State Health Management Agency, the Office of the Special Adviser on the Blue Economy, the Office for Private and Local Community Engagement, and private sector partners.</p>
+            <div class="chips">
+              <span class="chip on">LASHMA</span>
+              <span class="chip on">SA, Blue Economy</span>
+              <span class="chip on">OPLCE</span>
+              <span class="chip on">IGA Nigeria Ltd</span>
+              <span class="chip">Community heads &amp; rulers, 134 communities</span>
+            </div>
+            <div class="panel" style="margin-top:0.8cqh;">
+              <div class="tag">What we bring to a partnership</div>
+              <p>The community relationships, the named local contact structure, the survey infrastructure, and the register itself — positioned to continue as the implementation and monitoring partner for any government-funded intervention that follows.</p>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><b>Independent coverage</b><span>guardian.ng · vanguardngr.com · theguildng.com — June 2026</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 24 ================================================================ -->
+    <section class="slide" data-title="Handover to the platform">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 04</span><span class="sep">/</span><span>Our interventions</span></div>
+        <div class="body cols-2">
+          <div class="stack">
+            <h2>Everything after this point is live on screen</h2>
+            <p class="read">The rest of this briefing runs in the platform rather than the slides. It queries the same register at request time, so nothing shown is a screenshot of a number that has since moved.</p>
+            <ul class="plain">
+              <li><b>Overview</b> — the ten headline figures, the community map over satellite imagery, and the communities ranked by how many hardship conditions each recorded</li>
+              <li><b>Community dossier</b> — any one of the 134, with its head, contacts, conditions and completeness</li>
+              <li><b>Priorities</b> — the model that ranks communities, with every weight shown and adjustable</li>
+              <li><b>Scenario lab</b> — place a health centre, water point, emergency post, solar hub or jetty and see who it reaches</li>
+              <li><b>Data quality</b> — what is missing, per field, published rather than hidden</li>
+            </ul>
+          </div>
+          <div class="stack">
+            <div class="panel accent-reed">
+              <div class="tag">Ask it anything on the day</div>
+              <h3>Three questions the platform answers live</h3>
+              <p><b style="color:var(--chalk);">Which communities have no motorised way out in an emergency?</b> Filter on the map and read them off by name and LGA.</p>
+              <p><b style="color:var(--chalk);">If we site one facility, where should it go?</b> The scenario lab draws the catchment and counts who falls inside it.</p>
+              <p><b style="color:var(--chalk);">How do you know?</b> Every figure carries its source, its method in plain English, and its limitations.</p>
+            </div>
+            <div class="callout"><b>The default map is satellite imagery.</b> For settlements strung along creeks and sandbars, a drawn basemap erases exactly the thing that makes them hard to reach.</div>
+          </div>
+        </div>
+        <div class="foot"><b>Next</b><span>Switch to the dashboard, then return for Part 05</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 25 ================================================================ -->
+    <section class="slide" data-title="Part 05 — Solutions" data-divider="1">
+      <div class="frame" style="grid-template-rows: auto 1fr auto;">
+        <div class="rail"><span class="part">Part 05</span><span class="sep">/</span><span>Solutions</span></div>
+        <div class="divider">
+          <div class="n">05</div>
+          <h2>What we are asking for, in what order</h2>
+          <p>Every recommendation below is anchored to a measured indicator in the register, so progress against it can be tracked with the same survey structure rather than a new evaluation framework.</p>
+        </div>
+        <div class="foot"><b>Baseline report</b><span>Part 8 — Recommendations and Call to Action</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 26 ================================================================ -->
+    <section class="slide" data-title="The intervention portfolio">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 05</span><span class="sep">/</span><span>Solutions</span><span class="src">Baseline report §8.1–8.3</span></div>
+        <div class="body">
+          <h2>Three horizons</h2>
+          <div class="cols-3" style="display:grid; gap:1.6cqw;">
+            <div class="panel accent-coral">
+              <div class="tag">0–6 months</div>
+              <h3>Immediate</h3>
+              <ul class="plain" style="margin-top:0.4cqh;">
+                <li><b>Mobile health and immunisation outreach</b> to the highest-severity communities, starting with Cluster 4</li>
+                <li><b>Mobile PVC and NIN registration drives</b> run inside communities, sequenced by LGA registration rate, Lagos West first</li>
+                <li><b>Disaster committees and evacuation points</b> established in Lagos West and Lagos Central, and in erosion-affected communities</li>
+              </ul>
+            </div>
+            <div class="panel accent-sand">
+              <div class="tag">6–18 months</div>
+              <h3>Medium term</h3>
+              <ul class="plain" style="margin-top:0.4cqh;">
+                <li><b>Motorised boat ambulances</b> for Epe and Ibeju-Lekki, where unmotorised evacuation is most concentrated</li>
+                <li><b>4G network extension</b> to the Cluster 1 corridor in Lagos East — the highest-leverage single investment in the report</li>
+                <li><b>Electricity access</b> by grid extension or solar mini-grid, prioritising Cluster 2 in Lagos West</li>
+              </ul>
+            </div>
+            <div class="panel accent-reed">
+              <div class="tag">18 months +</div>
+              <h3>Long term</h3>
+              <ul class="plain" style="margin-top:0.4cqh;">
+                <li><b>School access programme</b> — secondary construction, transport or safe pedestrian bridges, targeting Cluster 3</li>
+                <li><b>Formalised sanitation</b> — shared or flush facilities and managed waste collection, cross-referenced to the LGA tables</li>
+                <li><b>Cooperative and thrift formation</b>, building on the Esusu and Ajo traditions already present</li>
+              </ul>
+            </div>
+          </div>
+          <div class="callout" style="margin-top:1.2cqh;"><b>And one framing ask.</b> That this baseline, and every intervention that follows it, is treated as direct input to Lagos State's 2052 mega-city plan — so that hard-to-reach riverine communities are built into that master plan rather than left outside it.</div>
+        </div>
+        <div class="foot"><b>Each item</b><span>Maps to a named cluster and a measured baseline indicator</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 27 ================================================================ -->
+    <section class="slide" data-title="How progress is measured">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 05</span><span class="sep">/</span><span>Solutions</span><span class="src">Baseline report §8.6</span></div>
+        <div class="body cols-2">
+          <div class="stack">
+            <h2>Funded against indicators, not against general need</h2>
+            <p class="read">Because every recommendation is anchored to a measured indicator, progress can be tracked by re-measuring the same 134-community register on a fixed cycle. No new evaluation framework, no new baseline survey, no gap between what was promised and what can be checked.</p>
+            <div class="callout"><b>The monitoring set is the survey.</b> Same register, same questions, same named contacts — which is also what makes it cheap to repeat.</div>
+          </div>
+          <div class="stack">
+            <table class="reg">
+              <thead><tr><th>Indicator to track</th><th class="n">Baseline</th><th class="n">Direction</th></tr></thead>
+              <tbody>
+                <tr><td>Voter registration rate</td><td class="n">48%</td><td class="n" style="color:var(--reed);">↑</td></tr>
+                <tr><td>Communities with no formal first-aid point</td><td class="n">83.6%</td><td class="n" style="color:var(--reed);">↓</td></tr>
+                <tr><td>Communities with an evacuation point or committee</td><td class="n">36.6%</td><td class="n" style="color:var(--reed);">↑</td></tr>
+                <tr><td>Communities with 4G or data coverage</td><td class="n">56.7%</td><td class="n" style="color:var(--reed);">↑</td></tr>
+                <tr><td>Average severity score, per cluster</td><td class="n">6.6–8.8</td><td class="n" style="color:var(--reed);">↓</td></tr>
+              </tbody>
+            </table>
+            <p class="small">Severity is tracked per cluster rather than as one average, to confirm that intervention is narrowing the gap between the least and most deprived clusters rather than only improving the mean.</p>
+          </div>
+        </div>
+        <div class="foot"><b>Cycle</b><span>Re-measured against the same 134-community register</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 28 ================================================================ -->
+    <section class="slide" data-title="KOH meets Lagos Riverine Communities">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 05</span><span class="sep">/</span><span>Proposal</span><span class="src">For discussion</span></div>
+        <div class="body cols-photo">
+          <div class="stack">
+            <div class="eyebrow">Proposal · not yet funded</div>
+            <h2>KOH meets Lagos Riverine Communities</h2>
+            <p class="read">A proposed joint programme taking KOH's delivery model into the settlements in this register — the places where 91% have never had a programme of any kind, and where the barrier is almost always physical reach rather than willingness.</p>
+            <p class="read">Blue Lagos supplies the half that is hardest to buy: <strong>the register, the named contact in each community, the recognised ruler who grants access, and the boats and field teams that get there.</strong> KOH supplies the intervention. Neither side has to build the other's half from scratch.</p>
+            <div class="callout"><b>Why these communities specifically.</b> A programme landing here is not competing with existing provision — in nine out of ten of these settlements there is none. The measured effect of a first intervention is therefore unusually large and unusually easy to attribute.</div>
+          </div>
+          <figure class="plate">
+            <img src="{{img:hero}}" alt="A riverine settlement in Lagos State approached from the water">
+            <figcaption>Reach is the constraint. Everything else follows from solving it.</figcaption>
+          </figure>
+        </div>
+        <div class="foot"><b>Status</b><span>Proposal for discussion with KOH · scope and scale to be agreed jointly</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 29 ================================================================ -->
+    <section class="slide" data-title="KOH — how it would run">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 05</span><span class="sep">/</span><span>Proposal</span><span class="src">KOH meets Lagos Riverine Communities</span></div>
+        <div class="body">
+          <h2>How it would run</h2>
+          <div class="cols-3" style="display:grid; gap:1.6cqw;">
+            <div class="panel">
+              <div class="tag">Phase 1 · Site selection</div>
+              <h3>Pick the communities from evidence, in the room</h3>
+              <p>Filter the live register against whatever KOH's programme is designed to change — health access, water, energy, connectivity, schooling — and take the ranked list straight off the platform. Severity score, population, cluster and access route are already attached to every community.</p>
+              <p style="color:var(--dim);">Output: a named shortlist with LGA, ruler, contact and coordinates.</p>
+            </div>
+            <div class="panel accent-sand">
+              <div class="tag">Phase 2 · Pilot</div>
+              <h3>A small number of communities, delivered properly</h3>
+              <p>Introduce the programme through the recognised community head, which is how 86.6% of these communities already resolve anything that matters. Blue Lagos runs access, logistics and the community side; KOH runs the intervention itself.</p>
+              <p style="color:var(--dim);">Output: delivery in a defined set of communities, with a named contact retained in each.</p>
+            </div>
+            <div class="panel accent-reed">
+              <div class="tag">Phase 3 · Measure and extend</div>
+              <h3>Re-measure the same indicator on the same register</h3>
+              <p>Because the baseline already exists for all 134 communities, the pilot's effect is measured against the same question asked the same way — not against a control group assembled after the fact. Extension is then sequenced by cluster.</p>
+              <p style="color:var(--dim);">Output: a before-and-after on a published indicator, per community.</p>
+            </div>
+          </div>
+          <div class="cols-2" style="display:grid; gap:1.6cqw; margin-top:1.4cqh;">
+            <div class="panel">
+              <div class="tag">Blue Lagos brings</div>
+              <p>The 134-community register and live platform · named contacts and rulers in every community · field teams, boats and access logistics · enumeration capacity for the re-measure · the government relationships already in place.</p>
+            </div>
+            <div class="panel accent-coral">
+              <div class="tag">To agree with KOH</div>
+              <p>The intervention itself and its unit economics · target communities and pilot size · funding envelope and timeline · KOH's own reporting and branding requirements. This slide is the frame for that conversation, not a settled scope.</p>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><b>Next step</b><span>A working session against the live register to fix the shortlist and the pilot size</span><span class="num"></span></div>
+      </div>
+    </section>
+
+    <!-- 30 ================================================================ -->
+    <section class="slide" data-title="The ask">
+      <div class="frame">
+        <div class="rail"><span class="part">Part 05</span><span class="sep">/</span><span>Close</span></div>
+        <div class="body cols-photo">
+          <div class="stack">
+            <h2>These are Lagos residents. They are simply not on the list yet.</h2>
+            <p class="read">502,002 people and 241,053 registered voters, already contributing to the state economy through fishing, farming and trading, in communities that nine times out of ten have never had a programme of any kind reach them.</p>
+            <p class="read">The evidence now exists at community level, the delivery relationships exist, and the monitoring structure is the same survey. <strong>What is missing is the decision.</strong></p>
+            <div class="figs cols-3" style="margin-top:0.6cqh;">
+              <div class="fig tide sm"><div class="v">134</div><div class="k">Communities, named</div></div>
+              <div class="fig tide sm"><div class="v">13</div><div class="k">Indicators, measured</div></div>
+              <div class="fig tide sm"><div class="v">4</div><div class="k">Clusters, sequenced</div></div>
+            </div>
+          </div>
+          <figure class="plate">
+            <img src="{{img:banner}}" alt="Blue Lagos team with a branded banner among community residents">
+            <figcaption>No community is left behind</figcaption>
+          </figure>
+        </div>
+        <div class="foot"><b>Blue Lagos Initiatives</b><span>bluelagos.org · bluelagos247@gmail.com · Instagram @blue.lagos · X @BlueLagos1 · YouTube Blue Lagos</span><span class="num"></span></div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div class="progress" id="progress" style="width:0"></div>
+
+<nav class="hud" id="hud" aria-label="Presentation controls">
+  <button type="button" id="prev" aria-label="Previous slide">←&nbsp; Prev</button>
+  <button type="button" id="next" aria-label="Next slide">Next &nbsp;→</button>
+  <button type="button" id="contents" aria-label="Show contents">Contents (C)</button>
+  <span class="count"><span id="cur">1</span> / <span id="tot">30</span></span>
+</nav>
+
+<div class="jump" id="jump" role="dialog" aria-modal="true" aria-label="Contents">
+  <h3>Contents</h3>
+  <ol id="jumplist"></ol>
+</div>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var cur = 0;
+  var hud = document.getElementById("hud");
+  var jump = document.getElementById("jump");
+  var progress = document.getElementById("progress");
+  var curEl = document.getElementById("cur");
+  document.getElementById("tot").textContent = String(slides.length);
+
+  slides.forEach(function (s, i) {
+    var num = s.querySelector(".foot .num");
+    if (num) num.textContent = String(i + 1).padStart(2, "0") + " / " + slides.length;
+  });
+
+  function show(i) {
+    cur = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach(function (s, n) { s.classList.toggle("is-current", n === cur); });
+    curEl.textContent = String(cur + 1);
+    progress.style.width = ((cur + 1) / slides.length * 100) + "%";
+    try { location.hash = String(cur + 1); } catch (e) { /* hash blocked in some hosts */ }
+  }
+
+  // Contents list, built from each slide's own title.
+  var list = document.getElementById("jumplist");
+  slides.forEach(function (s, i) {
+    var li = document.createElement("li");
+    var b = document.createElement("button");
+    b.type = "button";
+    b.innerHTML = '<span class="i">' + String(i + 1).padStart(2, "0") + "</span><span>" +
+      (s.getAttribute("data-title") || "Slide") + "</span>";
+    b.addEventListener("click", function () { show(i); toggleJump(false); });
+    li.appendChild(b);
+    list.appendChild(li);
+  });
+
+  function toggleJump(on) {
+    jump.classList.toggle("show", on === undefined ? !jump.classList.contains("show") : on);
+  }
+
+  document.getElementById("prev").addEventListener("click", function () { show(cur - 1); });
+  document.getElementById("next").addEventListener("click", function () { show(cur + 1); });
+  document.getElementById("contents").addEventListener("click", function () { toggleJump(); });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") { e.preventDefault(); show(cur + 1); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); show(cur - 1); }
+    else if (e.key === "Home") { show(0); }
+    else if (e.key === "End") { show(slides.length - 1); }
+    else if (e.key === "c" || e.key === "C") { toggleJump(); }
+    else if (e.key === "Escape") { toggleJump(false); }
+  });
+
+  // The HUD stays out of the way until the presenter moves the pointer.
+  var hide;
+  function wake() {
+    hud.classList.add("show");
+    clearTimeout(hide);
+    hide = setTimeout(function () { hud.classList.remove("show"); }, 2200);
+  }
+  document.addEventListener("mousemove", wake);
+  document.addEventListener("touchstart", wake, { passive: true });
+
+  // Tap the right or left third to advance on a touch screen.
+  document.querySelector(".stage").addEventListener("click", function (e) {
+    if (jump.classList.contains("show")) return;
+    var x = e.clientX / window.innerWidth;
+    if (x > 0.72) show(cur + 1);
+    else if (x < 0.28) show(cur - 1);
+  });
+
+  var start = parseInt((location.hash || "").replace("#", ""), 10);
+  show(isNaN(start) ? 0 : start - 1);
+})();
+</script>

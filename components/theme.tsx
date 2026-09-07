@@ -3,8 +3,11 @@
 /**
  * Theme system for Blue Lagos.
  *
- *   "deep" — Deep Coast (night lagoon)
- *   "warm" — Warm Coast (cream policy-report / map-room)
+ *   "coast" — Coastal Day (cool off-white policy-report / map-room) — DEFAULT
+ *   "deep"  — Deep Coast (night lagoon)
+ *
+ * The storage key still reads "warm" for the light theme so an existing
+ * preference survives the palette change; only the palette and the name moved.
  *
  * The chosen theme lives in one place: the `data-theme` attribute on the
  * document element. That makes the whole palette a single CSS variable swap,
@@ -13,7 +16,7 @@
  * of truth rather than a duplicate copy in React state.
  *
  * THEME_INIT_SCRIPT runs in the document head before first paint, so the stored
- * (or system-preferred) theme is applied with no flash.
+ * theme — or the default — is applied with no flash.
  */
 
 import { useCallback, useSyncExternalStore } from "react";
@@ -22,18 +25,11 @@ import { Moon, Sun } from "lucide-react";
 export type ThemeName = "deep" | "warm";
 export const THEME_STORAGE_KEY = "blue-lagos-theme";
 const THEME_EVENT = "bluelagos:themechange";
+/** Coastal Day is what the platform is presented in unless someone opts out. */
+const DEFAULT_THEME: ThemeName = "warm";
 
 /** Runs before paint. Kept dependency-free and small on purpose. */
-export const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem("${THEME_STORAGE_KEY}");if(t!=="deep"&&t!=="warm"){t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches?"warm":"deep"}document.documentElement.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","deep")}})()`;
-
-function storedPreference(): ThemeName | null {
-  try {
-    const value = localStorage.getItem(THEME_STORAGE_KEY);
-    return value === "deep" || value === "warm" ? value : null;
-  } catch {
-    return null; // storage blocked — follow the system instead
-  }
-}
+export const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem("${THEME_STORAGE_KEY}");if(t!=="deep"&&t!=="warm"){t="${DEFAULT_THEME}"}document.documentElement.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","${DEFAULT_THEME}")}})()`;
 
 function applyTheme(next: ThemeName) {
   document.documentElement.setAttribute("data-theme", next);
@@ -43,25 +39,18 @@ function applyTheme(next: ThemeName) {
 /* --- external store: the DOM attribute --- */
 
 function getSnapshot(): ThemeName {
-  return document.documentElement.getAttribute("data-theme") === "warm" ? "warm" : "deep";
+  return document.documentElement.getAttribute("data-theme") === "deep" ? "deep" : "warm";
 }
 
 /** The server always renders the default; the init script corrects it before paint. */
-const getServerSnapshot = (): ThemeName => "deep";
+const getServerSnapshot = (): ThemeName => DEFAULT_THEME;
 
+// Coastal Day is the default everywhere, including on machines set to dark
+// mode: the platform is presented on projectors and in printed screenshots, and
+// a stable default matters more there than following the operating system.
 function subscribe(onChange: () => void) {
-  const media = window.matchMedia("(prefers-color-scheme: light)");
-  // Keep following the system for as long as no explicit choice has been made.
-  const onSystemChange = () => {
-    if (storedPreference()) return;
-    applyTheme(media.matches ? "warm" : "deep");
-  };
-  media.addEventListener("change", onSystemChange);
   addEventListener(THEME_EVENT, onChange);
-  return () => {
-    media.removeEventListener("change", onSystemChange);
-    removeEventListener(THEME_EVENT, onChange);
-  };
+  return () => removeEventListener(THEME_EVENT, onChange);
 }
 
 /**
@@ -106,8 +95,8 @@ export function ThemeToggle() {
       <button
         type="button"
         aria-pressed={theme === "warm"}
-        aria-label="Warm Coast — light appearance"
-        title="Warm Coast (light)"
+        aria-label="Coastal Day — light appearance"
+        title="Coastal Day (light)"
         onClick={() => setTheme("warm")}
       >
         <Sun aria-hidden="true" />

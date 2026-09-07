@@ -199,9 +199,9 @@ worse than a total that admits its coverage.
 
 **54. Can this be shown in a lighter appearance for print or a lit room?**
 Yes. The toggle in the top bar switches between **Deep Coast** (dark) and
-**Warm Coast** (light). It changes the whole interface including maps and
+**Coastal Day** (light). It changes the whole interface including maps and
 charts, and the choice is remembered. Deep Coast reads better on a projector;
-Warm Coast reads better in a lit room and in printed screenshots.
+Coastal Day reads better in a lit room and in printed screenshots.
 
 **55. Why do some map layers take a moment to appear?**
 Because they are only fetched when you ask for them. The waterway network alone

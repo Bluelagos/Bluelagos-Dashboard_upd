@@ -37,9 +37,10 @@ following the system preference until the viewer chooses.
 than one flat navy. Ocean blue, lagoon teal, muted indigo, calm green, olive,
 warm amber, restrained coral.
 
-**Warm Coast** — cream ground (`#f2ece1`), warm off-white cards (`#fffdf8`),
-deep navy text (`#12242f`), Lagos blue `#0e6fa8`, teal `#0f8d84`, rust and
-amber. A policy report crossed with a map room, not a beige form.
+**Coastal Day** — cool, deeper off-white ground (`#dfe6ea`), pale blue-grey cards (`#f2f6f8`),
+deep navy text (`#0d1f29`), Lagos blue `#0d6aa0`, teal `#0d857e`, rust and
+amber. A policy report crossed with a map room, not a beige form. It is the
+default appearance; Deep Coast is the opt-in.
 
 Implementation notes worth knowing:
 

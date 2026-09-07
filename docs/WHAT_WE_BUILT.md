@@ -57,7 +57,7 @@ New `lib/spatial/` module. Real calculations, all pure and unit-tested:
 - **`npm run snapshot:presentation`** — fetches the full paginated register from Supabase, checks count integrity and identity fields, and writes a frozen `data/presentation-snapshot.json` (134 rows, no secrets).
 - The data layer now falls back to that snapshot **only** if the live query fails **and** `NEXT_PUBLIC_ALLOW_SNAPSHOT_FALLBACK=1` (it is set in `.env.local`). When it does, every page shows a **"VERIFIED SNAPSHOT"** banner with the snapshot timestamp. It is never a silent swap.
 - **`npm run presentation:check`** — a read-only status board (live data reachable? snapshot present and fresh? boundaries valid? OSM layers present? key routes present?) to run before leaving for the meeting.
-- The map already has a non-satellite dark basemap as the default, so a failing satellite tile provider does not break the demo.
+- The map defaults to satellite imagery, with a light canvas basemap one click away, so a failing tile provider still leaves the boundaries, community points and analysis on screen.
 
 ## 3. Architecture in one picture
 

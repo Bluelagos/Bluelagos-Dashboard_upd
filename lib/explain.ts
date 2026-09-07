@@ -68,6 +68,70 @@ export const EXPLAIN = {
     link: methodology("population", "How population is counted"),
   },
 
+  households: {
+    title: "Households represented",
+    hint: "A floor, not a total",
+    summary:
+      "The smallest number of households the surveyed communities can contain, given the household band each one reported.",
+    why: "Households, not people, are the unit most delivery programmes budget against — a latrine block, a meter, a boat, a registration visit.",
+    methodPlain:
+      "The survey recorded households as a band (for example '101 to 150'), never as an exact count. We add up the bottom of every band, so the figure is the least it can be rather than a guess at the middle. Communities that gave no band add nothing.",
+    methodTechnical:
+      "Lower-bound sum: SUM(lower edge of household_estimated_population band) over records with a parseable band. 'Below 50' contributes 0. No midpoint imputation, no distributional model, and communities without a band are reported as unknown rather than imputed.",
+    source: "Field",
+    sourceDetail: "Community-reported household bands",
+    limitations:
+      "This is a floor and will understate the true count, by more where communities reported wide or open-ended bands such as 'Above 1000'. It is not comparable to a household census.",
+    link: methodology("population", "How population is counted"),
+  },
+
+  voters: {
+    title: "Registered voters",
+    summary:
+      "The number of registered voters the surveyed communities reported, added together.",
+    why: "It is the one indicator here that maps directly onto an existing government system, so it shows how far state machinery already reaches into these settlements.",
+    methodPlain:
+      "Each community's own figure for registered voters, added together. Communities that did not give a figure are left out rather than counted as zero.",
+    methodTechnical:
+      "Null-preserving sum: SUM(estimated_registered_voters) over non-null records, reported with known/unknown counts. Not reconciled against the INEC register — the two are independent counts.",
+    source: "Field",
+    sourceDetail: "Community-reported estimates",
+    limitations:
+      "Community-reported, not drawn from the national voter roll, so it should be read as the community's own account of its registration, not an official figure.",
+    link: methodology("field-survey", "How the survey was collected"),
+  },
+
+  women: {
+    title: "Women recorded",
+    summary: "The number of women living in the surveyed communities, as estimated during the survey.",
+    why: "Maternal care, water collection and market access all fall disproportionately on women in these communities, so the count sizes those interventions.",
+    methodPlain:
+      "Each community's own estimate of how many women live there, added together. Communities without an estimate are left out of the total.",
+    methodTechnical:
+      "Null-preserving sum: SUM(estimated_number_of_women) over non-null records, reported with known/unknown counts.",
+    source: "Field",
+    sourceDetail: "Community-reported estimates",
+    limitations:
+      "A field estimate given by the community head or residents, not a disaggregated census, and it is not guaranteed to be internally consistent with the population estimate.",
+    link: methodology("population", "How population is counted"),
+  },
+
+  youth: {
+    title: "Youth aged 18 to 35",
+    summary:
+      "The number of young adults aged 18 to 35 in the surveyed communities, as estimated during the survey.",
+    why: "It is the group any livelihood, skills or digital-access programme would work with, and it is already resident rather than needing to be attracted in.",
+    methodPlain:
+      "Each community's own estimate of its 18-to-35 population, added together. Communities without an estimate are left out of the total.",
+    methodTechnical:
+      "Null-preserving sum: SUM(estimated_number_of_youth) over non-null records, reported with known/unknown counts.",
+    source: "Field",
+    sourceDetail: "Community-reported estimates",
+    limitations:
+      "A field estimate rather than an age-structured census; the 18-to-35 band was defined on the questionnaire and applied by the enumerator.",
+    link: methodology("population", "How population is counted"),
+  },
+
   healthDistance: {
     title: "Distance to health facility",
     hint: "Straight-line estimate",
